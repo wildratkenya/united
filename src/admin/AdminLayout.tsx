@@ -139,7 +139,14 @@ const AdminLayout = () => {
             <span className="text-xs text-muted-foreground hidden sm:block">
               {new Date().toLocaleDateString('en-KE', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-orange-400 flex items-center justify-center lg:hidden">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 hover:bg-red-50 transition"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span className="hidden xs:inline">Sign Out</span>
+            </button>
+            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-orange-400 flex items-center justify-center">
               <span className="text-white text-xs font-bold">{userInitials}</span>
             </div>
           </div>
