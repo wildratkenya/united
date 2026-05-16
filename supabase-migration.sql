@@ -15,58 +15,11 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = on;
 
---
--- FUNCTIONS
---
-
-CREATE OR REPLACE FUNCTION public.crm_campaigns_claim_due(p_limit integer)
- RETURNS SETOF public.crm_campaigns
- LANGUAGE plpgsql
-AS $$
-BEGIN
-RETURN QUERY UPDATE crm_campaigns
-SET status = 'sending', sent_at = NULL
-WHERE id IN (
-SELECT due_id FROM (
-SELECT id AS due_id FROM crm_campaigns
-WHERE status = 'scheduled' AND scheduled_at <= NOW()
-ORDER BY scheduled_at
-FOR UPDATE SKIP LOCKED
-LIMIT p_limit
-) due_rows
-)
-RETURNING *;
-END $$;
-
-CREATE OR REPLACE FUNCTION public.crm_flow_queue_claim(p_limit integer, p_worker text, p_lock_seconds integer DEFAULT 300)
- RETURNS SETOF public.crm_flow_step_queue
- LANGUAGE plpgsql
-AS $$
-BEGIN
-RETURN QUERY UPDATE crm_flow_step_queue
-SET locked_at = NOW(),
-locked_by = p_worker,
-attempts = attempts + 1
-WHERE id IN (
-SELECT due_id FROM (
-SELECT id AS due_id FROM crm_flow_step_queue
-WHERE finished_at IS NULL
-AND attempts < max_attempts
-AND run_at <= NOW()
-AND (locked_at IS NULL OR locked_at < NOW() - make_interval(secs => p_lock_seconds))
-ORDER BY run_at
-FOR UPDATE SKIP LOCKED
-LIMIT p_limit
-) due_rows
-)
-RETURNING *;
-END $$;
-
 SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TABLES
+-- 1. TABLES (must come before functions that reference them)
 --
 
 CREATE TABLE IF NOT EXISTS public.crm_campaigns (
@@ -299,7 +252,54 @@ CREATE TABLE IF NOT EXISTS public.orders (
 );
 
 --
--- DATA
+-- 2. FUNCTIONS (after tables exist)
+--
+
+CREATE OR REPLACE FUNCTION public.crm_campaigns_claim_due(p_limit integer)
+ RETURNS SETOF public.crm_campaigns
+ LANGUAGE plpgsql
+AS $$
+BEGIN
+RETURN QUERY UPDATE crm_campaigns
+SET status = 'sending', sent_at = NULL
+WHERE id IN (
+SELECT due_id FROM (
+SELECT id AS due_id FROM crm_campaigns
+WHERE status = 'scheduled' AND scheduled_at <= NOW()
+ORDER BY scheduled_at
+FOR UPDATE SKIP LOCKED
+LIMIT p_limit
+) due_rows
+)
+RETURNING *;
+END $$;
+
+CREATE OR REPLACE FUNCTION public.crm_flow_queue_claim(p_limit integer, p_worker text, p_lock_seconds integer DEFAULT 300)
+ RETURNS SETOF public.crm_flow_step_queue
+ LANGUAGE plpgsql
+AS $$
+BEGIN
+RETURN QUERY UPDATE crm_flow_step_queue
+SET locked_at = NOW(),
+locked_by = p_worker,
+attempts = attempts + 1
+WHERE id IN (
+SELECT due_id FROM (
+SELECT id AS due_id FROM crm_flow_step_queue
+WHERE finished_at IS NULL
+AND attempts < max_attempts
+AND run_at <= NOW()
+AND (locked_at IS NULL OR locked_at < NOW() - make_interval(secs => p_lock_seconds))
+ORDER BY run_at
+FOR UPDATE SKIP LOCKED
+LIMIT p_limit
+) due_rows
+)
+RETURNING *;
+END $$;
+
+--
+-- 3. DATA
 --
 
 INSERT INTO public.crm_availability (id, calendar_id, day_of_week, start_time, end_time, is_active, created_at) VALUES
@@ -322,7 +322,7 @@ INSERT INTO public.orders (id, order_id, customer_name, email, phone, address, s
 ('01e18fdc-4405-4d62-859e-fbd0bb3711aa', 'UDC-2024-8472', 'Sarah W.', 'sarah@example.com', '+254712345678', 'Westlands, Nairobi', 'Dry Cleaning', '2026-05-16', '4:00 PM - 6:00 PM', NULL, '["3x Business Shirts", "1x Navy Suit", "2x Dresses"]', 2450, 'delivery', 3, '[{"done": true, "time": "Yesterday, 9:15 AM", "label": "Order Received", "stage": 0}, {"done": true, "time": "Yesterday, 11:40 AM", "label": "Processing", "stage": 1}, {"done": true, "time": "Today, 8:20 AM", "label": "Quality Check", "stage": 2}, {"done": true, "time": "Today, 3:45 PM", "label": "Out for Delivery", "stage": 3}, {"done": false, "time": "Today, 5:30 PM", "label": "Delivered", "stage": 4}]', 'Today, 5:30 PM', '2026-05-16 11:51:06.502344+00', '2026-05-16 11:51:06.502344+00');
 
 --
--- CONSTRAINTS & INDEXES
+-- 4. CONSTRAINTS & INDEXES
 --
 
 ALTER TABLE ONLY public.crm_appointments ADD CONSTRAINT crm_appointments_pkey PRIMARY KEY (id);
@@ -384,7 +384,7 @@ CREATE INDEX idx_orders_order_id ON public.orders USING btree (order_id);
 CREATE INDEX idx_orders_phone ON public.orders USING btree (phone);
 
 --
--- FOREIGN KEYS
+-- 5. FOREIGN KEYS
 --
 
 ALTER TABLE ONLY public.crm_appointments ADD CONSTRAINT crm_appointments_calendar_id_fkey FOREIGN KEY (calendar_id) REFERENCES public.crm_calendars(id) ON DELETE CASCADE;
@@ -405,7 +405,7 @@ ALTER TABLE ONLY public.crm_flow_step_queue ADD CONSTRAINT crm_flow_step_queue_f
 ALTER TABLE ONLY public.crm_flow_steps ADD CONSTRAINT crm_flow_steps_flow_id_fkey FOREIGN KEY (flow_id) REFERENCES public.crm_flows(id) ON DELETE CASCADE;
 
 --
--- ROW LEVEL SECURITY POLICIES
+-- 6. ROW LEVEL SECURITY POLICIES
 --
 
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
