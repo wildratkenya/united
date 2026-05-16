@@ -168,12 +168,6 @@ const AdminWorkerSetup = () => {
               )}
             </div>
             <div className="md:col-span-2">
-              <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs mb-3 flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                <div>
-                  <strong>Note:</strong> For this to work without email verification, add the Supabase service role key as <code className="bg-amber-100 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> in your Vercel env vars, or disable "Confirm email" in Supabase Auth settings.
-                </div>
-              </div>
               <CaptchaWidget onToken={setCaptchaToken} />
               <Button type="submit" disabled={submitting} className="w-full h-11 bg-orange-500 hover:bg-orange-600">
                 {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating...</> : 'Create Worker Account'}
