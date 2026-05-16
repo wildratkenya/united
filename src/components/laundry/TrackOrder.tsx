@@ -174,12 +174,12 @@ const TrackOrder: React.FC<TrackOrderProps> = ({ prefilledId }) => {
             </div>
 
             {/* Progress bar */}
-            <div className="relative mb-12">
-              <div className="absolute top-6 left-0 right-0 h-1 bg-slate-200 rounded-full" />
-              <div
-                className="absolute top-6 left-0 h-1 bg-gradient-to-r from-[#ff6b6b] to-[#ff5252] rounded-full transition-all duration-1000"
-                style={{ width: `${(order.current_stage / (stages.length - 1)) * 100}%` }}
-              />
+              <div className="relative mb-12">
+                <div className="absolute top-6 left-0 right-0 h-1 bg-slate-200 rounded-full" />
+                <div
+                  className="absolute top-6 left-0 h-1 bg-gradient-to-r from-[#ff6b6b] to-[#ff5252] rounded-full transition-all duration-1000"
+                  style={{ width: `${Math.min((order.current_stage / 7) * 100, 100)}%` }}
+                />
               <div className="relative grid grid-cols-5 gap-2">
                 {stages.map((stage, i) => {
                   const Icon = stage.icon;
@@ -211,16 +211,17 @@ const TrackOrder: React.FC<TrackOrderProps> = ({ prefilledId }) => {
                 <div className="text-xs uppercase tracking-wider text-slate-500 mb-3 font-semibold">
                   Items ({Array.isArray(order.items) ? order.items.length : 0})
                 </div>
-                <ul className="space-y-2">
-                  {(Array.isArray(order.items) ? order.items : []).map((it: string, i: number) => (
-                    <li key={i} className="text-sm text-slate-700 flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500" /> {it}
-                    </li>
-                  ))}
-                  {(!order.items || order.items.length === 0) && (
-                    <li className="text-sm text-slate-400 italic">No items listed</li>
-                  )}
-                </ul>
+                  <ul className="space-y-2">
+                    {(Array.isArray(order.items) ? order.items : []).map((it: any, i: number) => (
+                      <li key={i} className="text-sm text-slate-700 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        {typeof it === 'string' ? it : `${it.name}${it.qty ? ` x${it.qty}` : ''}${it.price ? ` — KES ${it.price}` : ''}`}
+                      </li>
+                    ))}
+                    {(!order.items || order.items.length === 0) && (
+                      <li className="text-sm text-slate-400 italic">No items listed</li>
+                    )}
+                  </ul>
                 {order.total_amount > 0 && (
                   <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between">
                     <span className="text-sm text-slate-500">Total</span>
@@ -253,17 +254,26 @@ const TrackOrder: React.FC<TrackOrderProps> = ({ prefilledId }) => {
               <div className="bg-white rounded-2xl p-5 border border-slate-100">
                 <div className="text-xs uppercase tracking-wider text-slate-500 mb-3 font-semibold">Timeline</div>
                 <ul className="space-y-2">
-                  {(Array.isArray(order.timeline) ? order.timeline : []).map((t: any, i: number) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <div className={`w-2 h-2 rounded-full mt-1.5 ${t.done ? 'bg-[#ff6b6b]' : 'bg-slate-300'}`} />
-                      <div>
-                        <div className={`${t.done ? 'text-[#1a2332] font-medium' : 'text-slate-400'}`}>
-                          {t.label || stages[t.stage]?.label}
+                  {(Array.isArray(order.timeline) ? order.timeline : []).map((t: any, i: number) => {
+                    const label = t.label || t.status || '';
+                    const rawTime = t.time || t.timestamp || '';
+                    const time = rawTime ? (isNaN(Date.parse(rawTime)) ? rawTime : new Date(rawTime).toLocaleString('en-KE')) : '';
+                    const done = t.done !== undefined ? t.done : (i < order.timeline.length - 1);
+                    return (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <div className={`w-2 h-2 rounded-full mt-1.5 ${done ? 'bg-[#ff6b6b]' : 'bg-slate-300'}`} />
+                        <div>
+                          <div className={`${done ? 'text-[#1a2332] font-medium capitalize' : 'text-slate-400 capitalize'}`}>
+                            {label}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {time ? new Date(time).toLocaleString('en-KE') : ''}
+                          </div>
+                          {t.note && <div className="text-xs text-slate-400">{t.note}</div>}
                         </div>
-                        <div className="text-xs text-slate-500">{t.time}</div>
-                      </div>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
