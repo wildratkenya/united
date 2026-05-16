@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import Hero from '@/components/laundry/Hero';
 import HowItWorks from '@/components/laundry/HowItWorks';
 import Testimonials from '@/components/laundry/Testimonials';
-import FAQ from '@/components/laundry/FAQ';
 import BookingModal from '@/components/laundry/BookingModal';
 import { Award, MapPin, Users, Shield } from 'lucide-react';
 
@@ -60,7 +59,6 @@ const HomePage: React.FC = () => {
 
       <HowItWorks />
       <Testimonials />
-      <FAQ />
 
       <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} />
     </>
