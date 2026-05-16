@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useWorkerAuth } from '@/contexts/WorkerAuthContext';
-import { HardHat, LayoutDashboard, ListTodo, ClipboardList, LogOut, Menu, X } from 'lucide-react';
+import { HardHat, LayoutDashboard, ListTodo, ClipboardList, LogOut, Menu, X, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 
 const stationColors: Record<string, string> = {
@@ -11,6 +11,7 @@ const stationColors: Record<string, string> = {
 
 const navItems = [
   { to: '/worker', icon: LayoutDashboard, label: 'Kanban', end: true },
+  { to: '/worker/create-order', icon: PlusCircle, label: 'New Order' },
   { to: '/worker/queue', icon: ListTodo, label: 'My Queue' },
   { to: '/worker/orders', icon: ClipboardList, label: 'All Orders' },
 ];

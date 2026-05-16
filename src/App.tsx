@@ -32,6 +32,7 @@ import WorkerLayout from "./worker/WorkerLayout";
 import WorkerDashboard from "./worker/Dashboard";
 import WorkerMyQueue from "./worker/MyQueue";
 import WorkerOrders from "./worker/Orders";
+import WorkerCreateOrder from "./worker/CreateOrder";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => (
               <Route path="setup" element={<WorkerSetup />} />
               <Route element={<ProtectedWorkerRoute><WorkerLayout /></ProtectedWorkerRoute>}>
                 <Route index element={<WorkerDashboard />} />
+                <Route path="create-order" element={<WorkerCreateOrder />} />
                 <Route path="queue" element={<WorkerMyQueue />} />
                 <Route path="orders" element={<WorkerOrders />} />
               </Route>

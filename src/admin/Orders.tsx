@@ -17,7 +17,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Search, Loader2, ChevronLeft, ChevronRight, Eye, Package } from 'lucide-react';
+import { Search, Loader2, ChevronLeft, ChevronRight, Eye, Package, UserCheck } from 'lucide-react';
+import { toast } from '@/components/ui/sonner';
+
+interface WorkerProfile {
+  id: string; user_id: string; name: string; email: string; stations: string[];
+}
 
 interface Order {
   id: string;
@@ -37,6 +42,8 @@ interface Order {
   timeline: any[];
   eta: string;
   created_at: string;
+  assigned_to: string | null;
+  assigned_name: string | null;
 }
 
 const ORDER_STATUSES = [
@@ -81,10 +88,13 @@ const Orders = () => {
   const [total, setTotal] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [workers, setWorkers] = useState<WorkerProfile[]>([]);
+  const [assigning, setAssigning] = useState(false);
   const PAGE_SIZE = 20;
 
   useEffect(() => {
     loadOrders();
+    loadWorkers();
   }, [search, statusFilter, page]);
 
   const loadOrders = async () => {
@@ -145,6 +155,35 @@ const Orders = () => {
     if (selectedOrder?.id === orderId) {
       setSelectedOrder(prev => prev ? { ...prev, status: newStatus, current_stage: stageIndex, timeline: updatedTimeline } : null);
     }
+  };
+
+  const loadWorkers = async () => {
+    const { data } = await supabase.from('worker_profiles').select('*');
+    setWorkers((data as WorkerProfile[]) || []);
+  };
+
+  const assignOrder = async (orderId: string, workerId: string, workerName: string) => {
+    setAssigning(true);
+    const timelineEntry = {
+      status: selectedOrder?.status || 'received',
+      timestamp: new Date().toISOString(),
+      note: `Assigned to ${workerName} by Admin`,
+    };
+    const currentTimeline = selectedOrder?.timeline || [];
+    const updatedTimeline = [...currentTimeline, timelineEntry];
+
+    const { error } = await supabase.from('orders').update({
+      assigned_to: workerId, assigned_name: workerName,
+      timeline: updatedTimeline, updated_at: new Date().toISOString(),
+    }).eq('id', orderId);
+
+    if (error) { toast.error(error.message); }
+    else {
+      toast.success(`Assigned to ${workerName}`);
+      setSelectedOrder(prev => prev ? { ...prev, assigned_to: workerId, assigned_name: workerName, timeline: updatedTimeline } : null);
+      loadOrders();
+    }
+    setAssigning(false);
   };
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -312,6 +351,35 @@ const Orders = () => {
                     <p>{selectedOrder.notes}</p>
                   </div>
                 )}
+              </div>
+
+              {/* Assign */}
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Assigned To</p>
+                    <p className="text-sm text-muted-foreground">{selectedOrder.assigned_name || 'Not assigned'}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value=""
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          const w = workers.find(w => w.id === e.target.value);
+                          if (w) assignOrder(selectedOrder.id, w.user_id, w.name);
+                        }
+                      }}
+                      className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
+                      disabled={assigning}
+                    >
+                      <option value="">{assigning ? 'Assigning...' : 'Assign to...'}</option>
+                      {workers.filter(w => w.is_active).map(w => (
+                        <option key={w.id} value={w.id}>{w.name} — {w.stations?.join(', ')}</option>
+                      ))}
+                    </select>
+                    <UserCheck className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </div>
               </div>
 
               {/* Status update */}
