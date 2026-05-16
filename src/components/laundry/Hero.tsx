@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Truck, Leaf, Clock, ShieldCheck, Award } from 'lucide-react';
+import { Search, Truck, Leaf, Clock, ShieldCheck, Award, Calculator, Sparkles, Zap } from 'lucide-react';
+import QuotePopup from './QuotePopup';
 
 interface HeroProps {
   onTrack: (orderId: string) => void;
@@ -8,6 +9,7 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onTrack, onBook }) => {
   const [orderId, setOrderId] = useState('');
+  const [quoteOpen, setQuoteOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,12 +73,14 @@ const Hero: React.FC<HeroProps> = ({ onTrack, onBook }) => {
               >
                 Schedule Free Pickup
               </button>
-              <a
-                href="#services"
-                className="px-7 py-3.5 rounded-full border-2 border-white/30 hover:bg-white/10 text-white font-semibold transition"
+              <button
+                onClick={() => setQuoteOpen(true)}
+                className="px-7 py-3.5 rounded-full border-2 border-[#EE6633]/60 text-[#EE6633] hover:bg-[#EE6633] hover:text-white font-semibold transition group"
               >
-                View Services
-              </a>
+                <span className="flex items-center gap-2">
+                  <Zap className="w-4 h-4" /> Get Instant Quote
+                </span>
+              </button>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl">
@@ -101,6 +105,28 @@ const Hero: React.FC<HeroProps> = ({ onTrack, onBook }) => {
                 alt="United Dry Cleaners"
                 className="w-full h-[500px] object-cover"
               />
+              {/* Animated quote badge overlay on the image */}
+              <button
+                onClick={() => setQuoteOpen(true)}
+                className="absolute top-4 right-4 group cursor-pointer"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#EE6633] to-[#d45522] rounded-2xl blur-xl opacity-60 group-hover:opacity-80 transition-opacity animate-pulse" />
+                  <div className="relative flex items-center gap-3 bg-gradient-to-br from-[#EE6633] to-[#d45522] rounded-2xl px-5 py-3.5 shadow-2xl overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-[shimmer_2s_infinite]" />
+                    <div className="relative flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                        <Sparkles className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-xs text-white/70 font-medium">Instant</div>
+                        <div className="text-sm font-bold text-white tracking-wide">Quote</div>
+                      </div>
+                    </div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-white animate-ping absolute -top-1 -right-1" />
+                  </div>
+                </div>
+              </button>
             </div>
             <div className="absolute -bottom-6 -left-6 bg-white text-slate-900 rounded-2xl p-5 shadow-xl">
               <div className="flex items-center gap-3">
@@ -120,6 +146,8 @@ const Hero: React.FC<HeroProps> = ({ onTrack, onBook }) => {
           </div>
         </div>
       </div>
+
+      <QuotePopup open={quoteOpen} onClose={() => setQuoteOpen(false)} onBook={onBook} />
     </section>
   );
 };

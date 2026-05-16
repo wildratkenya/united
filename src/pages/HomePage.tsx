@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Hero from '@/components/laundry/Hero';
 import HowItWorks from '@/components/laundry/HowItWorks';
-import PricingCalculator from '@/components/laundry/PricingCalculator';
 import Testimonials from '@/components/laundry/Testimonials';
 import FAQ from '@/components/laundry/FAQ';
 import BookingModal from '@/components/laundry/BookingModal';
@@ -60,7 +59,6 @@ const HomePage: React.FC = () => {
       </section>
 
       <HowItWorks />
-      <PricingCalculator onBook={() => setBookingOpen(true)} />
       <Testimonials />
       <FAQ />
 
