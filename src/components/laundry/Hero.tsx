@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Truck, Leaf, Clock, ShieldCheck } from 'lucide-react';
+import { Search, Truck, Leaf, Clock, ShieldCheck, Award } from 'lucide-react';
 
 interface HeroProps {
   onTrack: (orderId: string) => void;
@@ -16,11 +16,11 @@ const Hero: React.FC<HeroProps> = ({ onTrack, onBook }) => {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#0f1828] via-[#1a2332] to-[#2d4059] text-white">
+    <section id="home" className="relative overflow-hidden bg-gradient-to-br from-[#0f1828] via-[#1a2332] to-[#2d4059] text-white">
       <div
         className="absolute inset-0 opacity-20"
         style={{
-          backgroundImage: `url('https://d64gsuwffb70l.cloudfront.net/6a0857b2724ad9ad4fbb89d9_1778931769399_a77b05d1.jpg')`,
+          backgroundImage: `url('https://uniteddrycleaners.co.ke/wp-content/uploads/2026/04/64263-1024x683.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -31,17 +31,17 @@ const Hero: React.FC<HeroProps> = ({ onTrack, onBook }) => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-sm mb-6">
-              <span className="w-2 h-2 rounded-full bg-[#ff6b6b] animate-pulse" />
-              Nairobi's #1 Premium Laundry Service
+              <Award className="w-4 h-4 text-[#EE6633]" />
+              Serving Nairobi Since 1965 — Over 60 Years of Excellence
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-              Fresh clothes,{' '}
-              <span className="text-[#ff6b6b]">tracked</span>
+              Where care meets{' '}
+              <span className="text-[#EE6633]">precision</span>
               <br />
-              every step.
+              in every service.
             </h1>
             <p className="text-lg text-slate-300 mb-8 max-w-xl">
-              Premium dry cleaning, laundry, and ironing with free pickup & delivery across Nairobi.
+              Premium dry cleaning, laundry, steam pressing, and more — with free pickup & delivery.
               Track your order live, from collection to your closet.
             </p>
 
@@ -58,7 +58,7 @@ const Hero: React.FC<HeroProps> = ({ onTrack, onBook }) => {
               />
               <button
                 type="submit"
-                className="px-5 sm:px-7 py-3 bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-semibold rounded-xl transition whitespace-nowrap text-sm sm:text-base"
+                className="px-5 sm:px-7 py-3 bg-[#EE6633] hover:bg-[#d45520] text-white font-semibold rounded-xl transition whitespace-nowrap text-sm sm:text-base"
               >
                 Track Order
               </button>
@@ -67,7 +67,7 @@ const Hero: React.FC<HeroProps> = ({ onTrack, onBook }) => {
             <div className="flex flex-wrap gap-3 mb-10">
               <button
                 onClick={onBook}
-                className="px-7 py-3.5 rounded-full bg-[#ff6b6b] hover:bg-[#ff5252] text-white font-semibold shadow-lg shadow-[#ff6b6b]/40 transition hover:-translate-y-0.5"
+                className="px-7 py-3.5 rounded-full bg-[#EE6633] hover:bg-[#d45520] text-white font-semibold shadow-lg shadow-[#EE6633]/40 transition hover:-translate-y-0.5"
               >
                 Schedule Free Pickup
               </button>
@@ -81,13 +81,13 @@ const Hero: React.FC<HeroProps> = ({ onTrack, onBook }) => {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl">
               {[
-                { icon: Clock, label: '24hr Service' },
+                { icon: Award, label: 'Since 1965' },
                 { icon: Truck, label: 'Free Pickup' },
                 { icon: Leaf, label: 'Eco-Friendly' },
-                { icon: ShieldCheck, label: 'Insured' },
+                { icon: Clock, label: 'Express Service' },
               ].map((f) => (
                 <div key={f.label} className="flex items-center gap-2 text-sm">
-                  <f.icon className="w-5 h-5 text-[#ff6b6b]" />
+                  <f.icon className="w-5 h-5 text-[#EE6633]" />
                   <span className="text-slate-200">{f.label}</span>
                 </div>
               ))}
@@ -97,25 +97,25 @@ const Hero: React.FC<HeroProps> = ({ onTrack, onBook }) => {
           <div className="hidden lg:block relative">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10">
               <img
-                src="https://d64gsuwffb70l.cloudfront.net/6a0857b2724ad9ad4fbb89d9_1778931769399_a77b05d1.jpg"
-                alt="Premium dry cleaning"
+                src="https://uniteddrycleaners.co.ke/wp-content/uploads/2026/04/64263-1024x683.jpg"
+                alt="United Dry Cleaners"
                 className="w-full h-[500px] object-cover"
               />
             </div>
             <div className="absolute -bottom-6 -left-6 bg-white text-slate-900 rounded-2xl p-5 shadow-xl">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                  <ShieldCheck className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <ShieldCheck className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <div className="font-bold">12,000+</div>
-                  <div className="text-xs text-slate-500">Happy Customers</div>
+                  <div className="font-bold">60+ Years</div>
+                  <div className="text-xs text-slate-500">Of Excellence</div>
                 </div>
               </div>
             </div>
-            <div className="absolute -top-6 -right-6 bg-[#ff6b6b] text-white rounded-2xl p-5 shadow-xl">
-              <div className="text-3xl font-bold">4.9★</div>
-              <div className="text-xs opacity-90">2,400+ Reviews</div>
+            <div className="absolute -top-6 -right-6 bg-[#EE6633] text-white rounded-2xl p-5 shadow-xl">
+              <div className="text-3xl font-bold">7</div>
+              <div className="text-xs opacity-90">Branches Nationwide</div>
             </div>
           </div>
         </div>
