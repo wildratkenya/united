@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, MapPin, Clock, CheckCircle2, Loader2, Copy } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, CheckCircle2, Loader2, Copy, Download } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 import { supabase } from '@/lib/supabase';
 
@@ -122,6 +122,35 @@ const BookingModal: React.FC<BookingModalProps> = ({ open, onClose, defaultServi
     toast.success('Order ID copied');
   };
 
+  const downloadReceipt = () => {
+    const receipt = `UNITED DRY CLEANERS LTD — Booking Confirmation
+${'='.repeat(50)}
+
+Order ID: ${createdOrderId}
+Customer: ${form.name}
+Email: ${form.email}
+Phone: ${form.phone}
+Service: ${form.service}
+Pickup Date: ${form.date}
+Time Slot: ${form.slot}
+Address: ${form.address}
+${form.notes ? `Notes: ${form.notes}\n` : ''}
+Status: Order Received
+
+${'='.repeat(50)}
+Thank you for choosing United Dry Cleaners Ltd!
+Track your order: https://united-kappa.vercel.app/track?orderId=${createdOrderId}
+`;
+    const blob = new Blob([receipt], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `UDC-${createdOrderId.replace('UDC-', '')}-receipt.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Receipt downloaded');
+  };
+
   const today = new Date().toISOString().split('T')[0];
 
   return (
@@ -149,9 +178,14 @@ const BookingModal: React.FC<BookingModalProps> = ({ open, onClose, defaultServi
               <div className="text-xs uppercase tracking-wider text-slate-500 mb-2">Your Order ID</div>
               <div className="flex items-center justify-between gap-2">
                 <span className="font-mono text-2xl font-bold text-[#ff6b6b]">{createdOrderId}</span>
-                <button onClick={copyId} className="p-2 rounded-lg hover:bg-slate-200 transition" title="Copy">
-                  <Copy className="w-4 h-4 text-slate-600" />
-                </button>
+                <div className="flex gap-1">
+                  <button onClick={downloadReceipt} className="p-2 rounded-lg hover:bg-slate-200 transition" title="Download Receipt">
+                    <Download className="w-4 h-4 text-slate-600" />
+                  </button>
+                  <button onClick={copyId} className="p-2 rounded-lg hover:bg-slate-200 transition" title="Copy">
+                    <Copy className="w-4 h-4 text-slate-600" />
+                  </button>
+                </div>
               </div>
               <p className="text-xs text-slate-500 mt-2">A confirmation has been sent to {form.email}. Use this ID to track your order anytime.</p>
             </div>
