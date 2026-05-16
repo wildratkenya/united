@@ -1,57 +1,75 @@
 import React from 'react';
-import { Leaf, Droplets, Recycle, Heart } from 'lucide-react';
+import { Award, Shield, Clock, Users, Sparkles, Wrench } from 'lucide-react';
 
 const stats = [
-  { icon: Droplets, value: '60%', label: 'Less water used than traditional cleaners' },
-  { icon: Leaf, value: '100%', label: 'Biodegradable detergents & solvents' },
-  { icon: Recycle, value: '15k+', label: 'Hangers recycled monthly' },
-  { icon: Heart, value: '0', label: 'Harsh chemicals on your skin' },
+  { icon: Award, value: '60+', label: 'Years of service excellence across Kenya', color: 'from-[#008cd5] to-[#2f5aae]' },
+  { icon: Users, value: '50K+', label: 'Satisfied customers served annually', color: 'from-[#EE6633] to-[#d45522]' },
+  { icon: Shield, value: '100%', label: 'Quality guarantee on every garment', color: 'from-emerald-500 to-emerald-600' },
+  { icon: Clock, value: '24hr', label: 'Standard turnaround time', color: 'from-purple-500 to-purple-600' },
 ];
 
-const EcoSection: React.FC = () => {
+const features = [
+  { icon: Wrench, title: 'German & Italian Equipment', desc: 'State-of-the-art dry cleaning machines from Bowe and Union for superior fabric care.' },
+  { icon: Sparkles, title: 'Certified Professionals', desc: 'Every garment handled by trained technicians with years of industry experience.' },
+  { icon: Shield, title: 'Barcode Tracking', desc: 'Your items are tracked individually from collection to delivery — no lost garments.' },
+];
+
+const QualitySection: React.FC = () => {
   return (
-    <section className="py-20 bg-gradient-to-br from-emerald-50 via-white to-teal-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+    <section className="py-24 bg-white relative overflow-hidden">
+      <div className="absolute right-0 top-0 w-[500px] h-full bg-gradient-to-l from-blue-50/50 to-transparent" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="grid lg:grid-cols-2 gap-14 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold mb-5">
-              <Leaf className="w-4 h-4" /> SUSTAINABILITY FIRST
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-[#008cd5] text-sm font-semibold mb-5 border border-blue-100">
+              <Award className="w-4 h-4" /> WHY UDC?
             </div>
             <h2 className="text-4xl sm:text-5xl font-bold text-[#1a2332] mb-5">
-              Clean clothes,<br />cleaner planet.
+              Quality that{' '}
+              <span className="text-[#EE6633]">speaks for itself</span>
             </h2>
-            <p className="text-slate-600 text-lg mb-8">
-              We've invested in modern, eco-friendly equipment and processes that protect both your
-              garments and the environment. Because looking good shouldn't cost the earth.
+            <p className="text-slate-500 text-lg mb-8 leading-relaxed">
+              For over 60 years, United Dry Cleaners has set the standard for garment care in Kenya. 
+              Our investment in modern technology and continuous staff training ensures your clothes 
+              receive the best possible treatment.
             </p>
-            <div className="grid grid-cols-2 gap-5">
-              {stats.map((s) => (
-                <div key={s.label} className="bg-white rounded-2xl p-5 shadow-sm border border-emerald-100">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
-                    <s.icon className="w-5 h-5 text-emerald-600" />
+
+            <div className="space-y-4">
+              {features.map((f, i) => (
+                <div key={i} className="flex gap-4 bg-slate-50 rounded-2xl p-5 border border-slate-100 hover:border-[#008cd5]/20 hover:shadow-sm transition">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#008cd5] to-[#2f5aae] flex items-center justify-center shrink-0 shadow-md shadow-blue-200">
+                    <f.icon className="w-6 h-6 text-white" />
                   </div>
-                  <div className="text-3xl font-bold text-[#1a2332] mb-1">{s.value}</div>
-                  <div className="text-xs text-slate-600">{s.label}</div>
+                  <div>
+                    <h3 className="font-bold text-[#1a2332] mb-1">{f.title}</h3>
+                    <p className="text-sm text-slate-500">{f.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="relative">
-            <div className="rounded-3xl overflow-hidden shadow-2xl">
-              <img
-                src="https://d64gsuwffb70l.cloudfront.net/6a0857b2724ad9ad4fbb89d9_1778931785380_2f552f0b.jpg"
-                alt="Eco-friendly laundry"
-                className="w-full h-[500px] object-cover"
-              />
-            </div>
-            <div className="absolute bottom-6 left-6 bg-white rounded-2xl p-5 shadow-xl max-w-xs">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <Leaf className="w-5 h-5 text-emerald-600" />
+
+          <div className="grid grid-cols-2 gap-5">
+            {stats.map((s) => (
+              <div key={s.label} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition border border-slate-100 hover:border-slate-200">
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center mb-4 shadow-lg`}>
+                  <s.icon className="w-6 h-6 text-white" />
                 </div>
-                <div className="font-bold text-[#1a2332]">Certified Green</div>
+                <div className="text-3xl font-bold text-[#1a2332] mb-1">{s.value}</div>
+                <div className="text-xs text-slate-500 leading-relaxed">{s.label}</div>
               </div>
-              <p className="text-xs text-slate-600">Officially recognized by Kenya's Environmental Protection Authority</p>
+            ))}
+
+            <div className="col-span-2 bg-gradient-to-br from-[#008cd5] to-[#005a8c] rounded-2xl p-6 text-white">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="w-5 h-5" />
+                <span className="font-bold">Our Promise</span>
+              </div>
+              <p className="text-sm text-white/80 leading-relaxed">
+                Not satisfied? We'll re-clean your item free of charge. 
+                That's the UDC guarantee — backed by 60 years of trust.
+              </p>
             </div>
           </div>
         </div>
@@ -60,4 +78,4 @@ const EcoSection: React.FC = () => {
   );
 };
 
-export default EcoSection;
+export default QualitySection;
