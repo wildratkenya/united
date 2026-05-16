@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone, Search } from 'lucide-react';
 
 interface HeaderProps {
@@ -6,28 +7,28 @@ interface HeaderProps {
   onBookClick: () => void;
 }
 
+const navLinks = [
+  { label: 'Home', to: '/' },
+  { label: 'About Us', to: '/about' },
+  { label: 'Services', to: '/services' },
+  { label: 'Our Branches', to: '/branches' },
+  { label: 'Contact Us', to: '/contact' },
+];
+
 const Header: React.FC<HeaderProps> = ({ onTrackClick, onBookClick }) => {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
 
-  const links = [
-    { label: 'Home', href: '#home' },
-    { label: 'About Us', href: '#about' },
-    { label: 'Services', href: '#services' },
-    { label: 'Our Branches', href: '#branches' },
-    { label: 'Contact Us', href: '#contact' },
-  ];
-
-  const scrollTo = (href: string) => {
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-    setOpen(false);
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname.startsWith(path);
   };
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             <img
               src="/logo.jpeg"
               alt="United Dry Cleaners"
@@ -50,17 +51,21 @@ const Header: React.FC<HeaderProps> = ({ onTrackClick, onBookClick }) => {
               <div className="font-bold text-[#1a2332] text-lg leading-tight">United</div>
               <div className="text-xs text-slate-500 leading-tight">Dry Cleaners Ltd</div>
             </div>
-          </div>
+          </Link>
 
           <nav className="hidden lg:flex items-center gap-8">
-            {links.map((l) => (
-              <button
-                key={l.href}
-                onClick={() => scrollTo(l.href)}
-                className="text-sm font-medium text-slate-700 hover:text-[#EE6633] transition-colors"
+            {navLinks.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className={`text-sm font-medium transition-colors ${
+                  isActive(l.to)
+                    ? 'text-[#EE6633]'
+                    : 'text-slate-700 hover:text-[#EE6633]'
+                }`}
               >
                 {l.label}
-              </button>
+              </Link>
             ))}
           </nav>
 
@@ -90,18 +95,21 @@ const Header: React.FC<HeaderProps> = ({ onTrackClick, onBookClick }) => {
 
         {open && (
           <div className="lg:hidden pb-4 space-y-2">
-            {links.map((l) => (
-              <button
-                key={l.href}
-                onClick={() => scrollTo(l.href)}
-                className="block w-full text-left px-4 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium"
+            {navLinks.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                onClick={() => setOpen(false)}
+                className={`block w-full text-left px-4 py-2 rounded-lg hover:bg-slate-100 font-medium ${
+                  isActive(l.to) ? 'text-[#EE6633]' : 'text-slate-700'
+                }`}
               >
                 {l.label}
-              </button>
+              </Link>
             ))}
             <div className="flex gap-2 px-4 pt-2">
-              <button onClick={onTrackClick} className="flex-1 px-4 py-2.5 rounded-full border-2 border-[#1a2332] text-[#1a2332] font-semibold text-sm">Track</button>
-              <button onClick={onBookClick} className="flex-1 px-4 py-2.5 rounded-full bg-[#EE6633] text-white font-semibold text-sm">Book</button>
+              <button onClick={() => { onTrackClick(); setOpen(false); }} className="flex-1 px-4 py-2.5 rounded-full border-2 border-[#1a2332] text-[#1a2332] font-semibold text-sm">Track</button>
+              <button onClick={() => { onBookClick(); setOpen(false); }} className="flex-1 px-4 py-2.5 rounded-full bg-[#EE6633] text-white font-semibold text-sm">Book</button>
             </div>
           </div>
         )}

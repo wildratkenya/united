@@ -6,7 +6,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
-import Index from "./pages/Index";
+import PageLayout from "@/components/layout/PageLayout";
+import HomePage from "./pages/HomePage";
+import AboutPage from "./pages/AboutPage";
+import ServicesPage from "./pages/ServicesPage";
+import BranchesPage from "./pages/BranchesPage";
+import ContactPage from "./pages/ContactPage";
+import TrackOrderPage from "./pages/TrackOrderPage";
+import PricingPage from "./pages/PricingPage";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./admin/Login";
 import AdminLayout from "./admin/AdminLayout";
@@ -27,7 +34,15 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route element={<PageLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/branches" element={<BranchesPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/track" element={<TrackOrderPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+            </Route>
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/setup" element={<AdminSetup />} />
             <Route
