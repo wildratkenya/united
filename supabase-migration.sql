@@ -506,6 +506,7 @@ CREATE TABLE IF NOT EXISTS public.admin_profiles (
 );
 ALTER TABLE public.admin_profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Admins can read own profile" ON public.admin_profiles FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Admins can insert own profile" ON public.admin_profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Admins can update own profile" ON public.admin_profiles FOR UPDATE USING (auth.uid() = user_id);
 
 -- Newsletter subscribers

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Send, Loader2 } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
+import { supabase } from '@/lib/supabase';
 
 const Footer: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +15,11 @@ const Footer: React.FC = () => {
     }
     setLoading(true);
     try {
+      await supabase.from('subscribers').upsert(
+        { email, source: 'newsletter', is_active: true },
+        { onConflict: 'email' }
+      );
+
       await fetch('https://famous.ai/api/crm/6a0857b2724ad9ad4fbb89d9/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

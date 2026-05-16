@@ -1,24 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Loader2, Shirt, CheckCircle, AlertCircle } from 'lucide-react';
-
-const ADMIN_EMAIL = 'admin@uniteddrycleaners.co.ke';
-const ADMIN_PASSWORD = 'P@ssword';
+import { Loader2, Shirt, CheckCircle, AlertCircle, Info } from 'lucide-react';
 
 const AdminSetup = () => {
-  const [email, setEmail] = useState(ADMIN_EMAIL);
-  const [password, setPassword] = useState(ADMIN_PASSWORD);
+  const [email, setEmail] = useState('admin@uniteddrycleaners.co.ke');
+  const [password, setPassword] = useState('P@ssword');
   const [name, setName] = useState('Super Admin');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [checking, setChecking] = useState(true);
   const [adminExists, setAdminExists] = useState(false);
+  const [needConfirmation, setNeedConfirmation] = useState(false);
+  const pollingRef = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,10 +36,20 @@ const AdminSetup = () => {
     setChecking(false);
   };
 
+  const waitForSession = async (): Promise<boolean> => {
+    for (let i = 0; i < 30; i++) {
+      await new Promise(r => setTimeout(r, 500));
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) return true;
+    }
+    return false;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
+    setNeedConfirmation(false);
 
     try {
       const { error: signUpError } = await supabase.auth.signUp({
@@ -55,10 +64,16 @@ const AdminSetup = () => {
         return;
       }
 
+      const signedIn = await waitForSession();
+
+      if (!signedIn) {
+        await supabase.auth.signInWithPassword({ email, password });
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
-        setError('User creation failed. Check if email confirmation is required in Supabase Auth settings.');
+        setNeedConfirmation(true);
         setSubmitting(false);
         return;
       }
@@ -107,7 +122,7 @@ const AdminSetup = () => {
             </div>
             <CardTitle>Already Set Up</CardTitle>
             <CardDescription>
-              An admin account already exists. Please login.
+              An admin account already exists.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -133,11 +148,6 @@ const AdminSetup = () => {
             <CardTitle>Admin Created!</CardTitle>
             <CardDescription>
               The super admin account has been created successfully.
-              {adminExists && (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Note: If email confirmation is required, please check the inbox for {ADMIN_EMAIL} and confirm the address before logging in.
-                </p>
-              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -172,43 +182,29 @@ const AdminSetup = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Admin Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-11"
-              />
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="text"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-11 font-mono"
-              />
-              <p className="text-xs text-muted-foreground">
-                Password is hashed and stored securely by Supabase Auth
-              </p>
+              <Input id="password" type="text" value={password} onChange={(e) => setPassword(e.target.value)} required className="h-11 font-mono" />
+              <p className="text-xs text-muted-foreground">Hashed and stored securely by Supabase Auth</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="name">Admin Name</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="h-11"
-              />
+              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required className="h-11" />
             </div>
 
             {error && (
-              <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
-                {error}
+              <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {needConfirmation && (
+              <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-sm flex items-start gap-2">
+                <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                <span>Account created but email confirmation is required. Check {email} inbox, confirm the address, then <a href="/admin/login" className="underline font-medium" onClick={(e) => { e.preventDefault(); navigate('/admin/login'); }}>login</a>.</span>
               </div>
             )}
 
