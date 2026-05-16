@@ -12,6 +12,16 @@ const stationGreeting: Record<string, string> = {
   supervisor: 'Oversee the full production flow.',
 };
 
+const stationLabel: Record<string, string> = {
+  intake: 'Intake & Sorting',
+  washing: 'Washing',
+  drying: 'Drying',
+  pressing: 'Pressing & Ironing',
+  packaging: 'Packaging',
+  delivery: 'Delivery',
+  supervisor: 'Supervisor',
+};
+
 const Dashboard = () => {
   const { profile } = useWorkerAuth();
 
@@ -20,11 +30,11 @@ const Dashboard = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#1a2332]">
-            {profile?.station === 'supervisor' ? 'Production Overview' : 'Your Station'}
+            {profile?.stations?.includes('supervisor') ? 'Production Overview' : 'Your Stations'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500">
-            {profile?.station
-              ? stationGreeting[profile.station] || 'Drag orders to advance them through the laundry process.'
+            {profile?.stations?.length
+              ? profile.stations.map(s => stationGreeting[s]).filter(Boolean).join(' ')
               : 'Drag orders between columns to update their status.'}
           </p>
         </div>
@@ -33,7 +43,7 @@ const Dashboard = () => {
             <HardHat className="w-5 h-5 text-[#EE6633]" />
             <div>
               <div className="text-sm font-semibold text-[#1a2332]">{profile.name}</div>
-              <div className="text-[10px] text-slate-400 capitalize">{profile.station}</div>
+              <div className="text-[10px] text-slate-400">{profile.stations?.map(s => stationLabel[s]).filter(Boolean).join(', ') || 'Multi-station'}</div>
             </div>
           </div>
         )}

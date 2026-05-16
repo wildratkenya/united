@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Loader2, HardHat, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, HardHat, CheckCircle, AlertCircle, Plus, XCircle } from 'lucide-react';
 
 const stations = [
   { value: 'intake', label: 'Intake & Sorting' },
@@ -18,7 +18,7 @@ const stations = [
 ];
 
 const WorkerSetup = () => {
-  const [form, setForm] = useState({ email: '', password: '', name: '', station: 'intake' });
+  const [form, setForm] = useState({ email: '', password: '', name: '', stations: [] as string[], selectedStation: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -34,17 +34,29 @@ const WorkerSetup = () => {
     });
   }, []);
 
+  const addStation = () => {
+    if (form.selectedStation && !form.stations.includes(form.selectedStation)) {
+      setForm(f => ({ ...f, stations: [...f.stations, f.selectedStation], selectedStation: '' }));
+    }
+  };
+
+  const removeStation = (value: string) => {
+    setForm(f => ({ ...f, stations: f.stations.filter(s => s !== value) }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
     setNeedConfirmation(false);
 
+    if (form.stations.length === 0) { setError('Add at least one station'); setSubmitting(false); return; }
+
     try {
       const { error: signUpError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
-        options: { data: { name: form.name, station: form.station } },
+        options: { data: { name: form.name, stations: form.stations } },
       });
       if (signUpError) { setError(signUpError.message); setSubmitting(false); return; }
 
@@ -58,7 +70,7 @@ const WorkerSetup = () => {
       if (!user) { setNeedConfirmation(true); setSubmitting(false); return; }
 
       const { error: insertError } = await supabase.from('worker_profiles').insert({
-        user_id: user.id, email: form.email, name: form.name, station: form.station, is_active: true,
+        user_id: user.id, email: form.email, name: form.name, stations: form.stations, is_active: true,
       });
       if (insertError) { setError(`Profile failed: ${insertError.message}`); setSubmitting(false); return; }
 
@@ -84,7 +96,7 @@ const WorkerSetup = () => {
             </div>
           </div>
           <CardTitle>Already Set Up</CardTitle>
-          <CardDescription>A worker account already exists. Use /worker/setup to add more workers after logging in via the admin panel.</CardDescription>
+          <CardDescription>A worker account already exists. Use the admin panel to add more workers.</CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={() => navigate('/worker/login')} className="w-full bg-[#EE6633] hover:bg-[#d45522]">Go to Login</Button>
@@ -139,14 +151,39 @@ const WorkerSetup = () => {
               <Input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} required className="font-mono" />
             </div>
             <div className="space-y-2">
-              <Label>Station</Label>
-              <select
-                value={form.station}
-                onChange={e => setForm(f => ({ ...f, station: e.target.value }))}
-                className="w-full h-11 rounded-xl border border-input bg-background px-3 text-sm"
-              >
-                {stations.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-              </select>
+              <Label>Stations / Roles</Label>
+              <div className="flex gap-2">
+                <select
+                  value={form.selectedStation}
+                  onChange={e => setForm(f => ({ ...f, selectedStation: e.target.value }))}
+                  className="flex-1 h-11 rounded-xl border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">Select a station...</option>
+                  {stations.filter(s => !form.stations.includes(s.value)).map(s => (
+                    <option key={s.value} value={s.value}>{s.label}</option>
+                  ))}
+                </select>
+                <button type="button" onClick={addStation} disabled={!form.selectedStation} className="h-11 px-4 rounded-xl bg-[#EE6633] text-white text-sm font-medium hover:bg-[#d45522] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1">
+                  <Plus className="h-4 w-4" /> Add
+                </button>
+              </div>
+              {form.stations.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {form.stations.map(s => {
+                    const st = stations.find(st => st.value === s);
+                    return (
+                      <span key={s} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                        {st?.label || s}
+                        <button type="button" onClick={() => removeStation(s)} className="hover:text-red-600 transition">
+                          <XCircle className="h-3.5 w-3.5" />
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400">No stations assigned yet.</p>
+              )}
             </div>
             {error && <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
             {needConfirmation && (

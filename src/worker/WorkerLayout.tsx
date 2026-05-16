@@ -6,7 +6,7 @@ import { useState } from 'react';
 const stationColors: Record<string, string> = {
   intake: 'bg-blue-500', washing: 'bg-purple-500', drying: 'bg-indigo-500',
   pressing: 'bg-orange-500', packaging: 'bg-pink-500', delivery: 'bg-green-500',
-  supervisor: 'bg-amber-500', general: 'bg-slate-500',
+  supervisor: 'bg-amber-500',
 };
 
 const navItems = [
@@ -67,7 +67,7 @@ const WorkerLayout = () => {
             <div className="flex items-center gap-3">
               {profile && (
                 <div className="hidden sm:flex items-center gap-2 text-xs">
-                  <div className={`w-2 h-2 rounded-full ${stationColors[profile.station] || 'bg-slate-500'}`} />
+                  <div className={`w-2 h-2 rounded-full ${stationColors[profile.stations?.[0]] || 'bg-slate-500'}`} />
                   <span className="text-slate-300">{profile.name}</span>
                 </div>
               )}
@@ -103,8 +103,8 @@ const WorkerLayout = () => {
             ))}
             {profile && (
               <div className="px-4 py-3 text-xs text-slate-400 border-t border-white/10 flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${stationColors[profile.station] || 'bg-slate-500'}`} />
-                {profile.name} • {profile.station}
+                <div className={`w-2 h-2 rounded-full ${stationColors[profile.stations?.[0]] || 'bg-slate-500'}`} />
+                {profile.name} • {profile.stations?.join(', ') || 'no station'}
               </div>
             )}
           </div>

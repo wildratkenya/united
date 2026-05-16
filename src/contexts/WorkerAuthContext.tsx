@@ -7,7 +7,7 @@ interface WorkerProfile {
   user_id: string;
   email: string;
   name: string;
-  station: string;
+  stations: string[];
 }
 
 interface WorkerAuthContextType {

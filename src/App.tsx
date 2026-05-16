@@ -25,6 +25,7 @@ import AdminSubscribers from "./admin/Subscribers";
 import AdminPricing from "./admin/Pricing";
 import AdminSettings from "./admin/Settings";
 import AdminSetup from "./admin/Setup";
+import AdminWorkerSetup from "./admin/WorkerSetup";
 import WorkerLogin from "./worker/Login";
 import WorkerSetup from "./worker/Setup";
 import WorkerLayout from "./worker/WorkerLayout";
@@ -59,6 +60,7 @@ const App = () => (
                 <Route path="orders" element={<AdminOrders />} />
                 <Route path="subscribers" element={<AdminSubscribers />} />
                 <Route path="pricing" element={<AdminPricing />} />
+                <Route path="workers/setup" element={<AdminWorkerSetup />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
             </Route>

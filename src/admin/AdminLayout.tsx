@@ -13,13 +13,15 @@ import {
   Menu,
   X,
   Shirt,
-  ChevronDown
+  ChevronDown,
+  HardHat
 } from 'lucide-react';
 
 const navItems = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
   { to: '/admin/orders', icon: ShoppingBag, label: 'Orders' },
   { to: '/admin/subscribers', icon: Users, label: 'Subscribers' },
+  { to: '/admin/workers/setup', icon: HardHat, label: 'Workers' },
   { to: '/admin/pricing', icon: DollarSign, label: 'Pricing' },
   { to: '/admin/settings', icon: Settings, label: 'Settings' },
 ];
