@@ -6,12 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Loader2, Shirt, Lock } from 'lucide-react';
+import { CaptchaWidget } from '@/components/CaptchaWidget';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
   const { login } = useAdminAuth();
   const navigate = useNavigate();
 
@@ -20,7 +22,7 @@ const AdminLogin = () => {
     setError('');
     setSubmitting(true);
 
-    const err = await login(email, password);
+    const err = await login(email, password, { captchaToken });
     setSubmitting(false);
 
     if (err) {
@@ -82,6 +84,7 @@ const AdminLogin = () => {
               </div>
             )}
 
+            <CaptchaWidget onToken={setCaptchaToken} />
             <Button type="submit" disabled={submitting} className="w-full h-11 bg-blue-600 hover:bg-blue-700">
               {submitting ? (
                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...</>
