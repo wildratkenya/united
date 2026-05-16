@@ -13,6 +13,7 @@ const actionLabels: Record<string, string> = {
   order_edited: 'Order Edited',
   worker_created: 'Worker Created',
   worker_deactivated: 'Worker Deactivated',
+  worker_activated: 'Worker Activated',
   admin_logout: 'Admin Logout',
   worker_logout: 'Worker Logout',
 };
@@ -27,6 +28,7 @@ const actionColors: Record<string, string> = {
   order_edited: 'bg-sky-100 text-sky-700',
   worker_created: 'bg-teal-100 text-teal-700',
   worker_deactivated: 'bg-rose-100 text-rose-700',
+  worker_activated: 'bg-teal-100 text-teal-700',
   admin_logout: 'bg-slate-100 text-slate-700',
   worker_logout: 'bg-slate-100 text-slate-700',
 };

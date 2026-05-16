@@ -10,6 +10,7 @@ type AuditAction =
   | 'order_edited'
   | 'worker_created'
   | 'worker_deactivated'
+  | 'worker_activated'
   | 'admin_logout'
   | 'worker_logout';
 

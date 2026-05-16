@@ -38,6 +38,7 @@ const AdminWorkerSetup = () => {
   const [captchaToken, setCaptchaToken] = useState('');
   const [workers, setWorkers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [toggling, setToggling] = useState<string | null>(null);
 
   useEffect(() => {
     loadWorkers();
@@ -112,6 +113,35 @@ const AdminWorkerSetup = () => {
       loadWorkers();
     } catch (err: any) { toast({ title: 'Error', description: err.message, variant: 'destructive' }); }
     setSubmitting(false);
+  };
+
+  const toggleWorker = async (worker: any) => {
+    setToggling(worker.id);
+    const newStatus = !worker.is_active;
+    const { error } = await supabase
+      .from('worker_profiles')
+      .update({ is_active: newStatus })
+      .eq('id', worker.id);
+
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({
+        title: newStatus ? 'Worker Activated' : 'Worker Deactivated',
+        description: `${worker.name} is now ${newStatus ? 'active' : 'inactive'}.`,
+      });
+      logAudit({
+        action: newStatus ? 'worker_activated' : 'worker_deactivated',
+        userId: user?.id,
+        userEmail: user?.email || undefined,
+        userName: profile?.name || 'Admin',
+        entityType: 'worker',
+        entityId: worker.email,
+        details: { workerName: worker.name, workerEmail: worker.email, previousStatus: worker.is_active, newStatus },
+      });
+      loadWorkers();
+    }
+    setToggling(null);
   };
 
   return (
@@ -223,7 +253,32 @@ const AdminWorkerSetup = () => {
                           ))}
                         </div>
                       </td>
-                      <td className="py-3">{w.is_active ? <span className="text-green-600 flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5" /> Active</span> : <span className="text-red-600 flex items-center gap-1"><XCircle className="h-3.5 w-3.5" /> Inactive</span>}</td>
+                      <td className="py-3">
+                        <div className="flex items-center gap-2">
+                          {w.is_active ? (
+                            <span className="text-green-600 flex items-center gap-1"><CheckCircle className="h-3.5 w-3.5" /> Active</span>
+                          ) : (
+                            <span className="text-red-600 flex items-center gap-1"><XCircle className="h-3.5 w-3.5" /> Inactive</span>
+                          )}
+                          <button
+                            onClick={() => toggleWorker(w)}
+                            disabled={toggling === w.id}
+                            className={`text-xs font-medium px-2 py-1 rounded-lg border transition ${
+                              w.is_active
+                                ? 'text-red-600 border-red-200 hover:bg-red-50'
+                                : 'text-green-600 border-green-200 hover:bg-green-50'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            {toggling === w.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : w.is_active ? (
+                              'Disable'
+                            ) : (
+                              'Enable'
+                            )}
+                          </button>
+                        </div>
+                      </td>
                       <td className="py-3 text-slate-500">{new Date(w.created_at).toLocaleDateString()}</td>
                     </tr>
                   ))}
