@@ -60,10 +60,10 @@ const About: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { name: 'Col. (Rtd) Philip K. Mwaniki', title: 'Chairman', img: '/board/placeholder-1.jpg' },
-              { name: 'Dr. Samuel Kamau Mungai', title: 'Managing Director', img: '/board/placeholder-2.jpg' },
-              { name: 'Eng. Henry J. Kamuti', title: 'Director', img: '/board/placeholder-3.jpg' },
-              { name: 'Francis Mburu Kahata', title: 'Director', img: '/board/placeholder-4.jpg' },
+              { name: 'Col. (Rtd) Philip K. Mwaniki', title: 'Chairman', img: '/images/Col-Rtd-Philip-1152x1536.jpeg' },
+              { name: 'Dr. Samuel Kamau Mungai', title: 'Managing Director', img: '/images/dr-samuel-kamau-mungai.jpeg' },
+              { name: 'Eng. Henry J. Kamuti', title: 'Director', img: '/images/eng-henry-kamuti.jpeg' },
+              { name: 'Francis Mburu Kahata', title: 'Director', img: '/images/francis-mburu-kahata.jpeg' },
             ].map((director, i) => (
               <div key={i} className="group text-center">
                 <div className="w-28 h-28 rounded-full mx-auto mb-4 overflow-hidden ring-4 ring-white/20 group-hover:ring-[#EE6633]/60 transition-all duration-300 shadow-xl">
