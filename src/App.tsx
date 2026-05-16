@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
@@ -43,23 +43,16 @@ const App = () => (
               <Route path="/track" element={<TrackOrderPage />} />
               <Route path="/pricing" element={<PricingPage />} />
             </Route>
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/setup" element={<AdminSetup />} />
-            <Route
-              path="/admin"
-              element={
-                <AdminAuthProvider>
-                  <ProtectedRoute>
-                    <AdminLayout />
-                  </ProtectedRoute>
-                </AdminAuthProvider>
-              }
-            >
-              <Route index element={<AdminDashboard />} />
-              <Route path="orders" element={<AdminOrders />} />
-              <Route path="subscribers" element={<AdminSubscribers />} />
-              <Route path="pricing" element={<AdminPricing />} />
-              <Route path="settings" element={<AdminSettings />} />
+            <Route path="/admin" element={<AdminAuthProvider><Outlet /></AdminAuthProvider>}>
+              <Route path="login" element={<AdminLogin />} />
+              <Route path="setup" element={<AdminSetup />} />
+              <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="orders" element={<AdminOrders />} />
+                <Route path="subscribers" element={<AdminSubscribers />} />
+                <Route path="pricing" element={<AdminPricing />} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
