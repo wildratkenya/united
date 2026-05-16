@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, Search, LogIn } from 'lucide-react';
+import { Menu, X, Phone, LogIn } from 'lucide-react';
 
 interface HeaderProps {
-  onTrackClick: () => void;
   onBookClick: () => void;
 }
 
 const navLinks = [
   { label: 'Home', to: '/' },
-  { label: 'About Us', to: '/about' },
+  { label: 'About', to: '/about' },
   { label: 'Services', to: '/services' },
-  { label: 'Our Branches', to: '/branches' },
+  { label: 'Branches', to: '/branches' },
   { label: 'Contact Us', to: '/contact' },
 ];
 
-const Header: React.FC<HeaderProps> = ({ onTrackClick, onBookClick }) => {
+const Header: React.FC<HeaderProps> = ({ onBookClick }) => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
@@ -53,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({ onTrackClick, onBookClick }) => {
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-6">
             {navLinks.map((l) => (
               <Link
                 key={l.to}
@@ -69,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ onTrackClick, onBookClick }) => {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
             <a href="tel:+254729112066" className="flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-[#1a2332]">
               <Phone className="w-4 h-4" />
               +254 729 112 066
@@ -80,12 +79,6 @@ const Header: React.FC<HeaderProps> = ({ onTrackClick, onBookClick }) => {
             >
               <LogIn className="w-4 h-4" /> Sign In
             </Link>
-            <button
-              onClick={onTrackClick}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-full border-2 border-[#1a2332] text-[#1a2332] font-semibold text-sm hover:bg-[#1a2332] hover:text-white transition"
-            >
-              <Search className="w-4 h-4" /> Track
-            </button>
             <button
               onClick={onBookClick}
               className="px-5 py-2.5 rounded-full bg-[#EE6633] text-white font-semibold text-sm hover:bg-[#d45520] shadow-lg shadow-[#EE6633]/30 transition"
@@ -115,7 +108,6 @@ const Header: React.FC<HeaderProps> = ({ onTrackClick, onBookClick }) => {
             ))}
             <div className="flex gap-2 px-4 pt-2">
               <Link to="/worker/login" onClick={() => setOpen(false)} className="flex-1 px-4 py-2.5 rounded-full border border-slate-300 text-slate-600 font-semibold text-sm text-center">Sign In</Link>
-              <button onClick={() => { onTrackClick(); setOpen(false); }} className="flex-1 px-4 py-2.5 rounded-full border-2 border-[#1a2332] text-[#1a2332] font-semibold text-sm">Track</button>
               <button onClick={() => { onBookClick(); setOpen(false); }} className="flex-1 px-4 py-2.5 rounded-full bg-[#EE6633] text-white font-semibold text-sm">Book</button>
             </div>
           </div>

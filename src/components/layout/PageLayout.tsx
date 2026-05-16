@@ -20,7 +20,7 @@ const PageLayout = () => {
 
   return (
     <div className="min-h-screen bg-white text-slate-900" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <Header onTrackClick={scrollToTrack} onBookClick={() => openBooking()} />
+      <Header onBookClick={() => openBooking()} />
       <Outlet />
       <Footer />
 
