@@ -57,37 +57,37 @@ const Footer: React.FC = () => {
           </form>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
           <div>
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#008cd5] to-[#2f5aae] flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-white">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#008cd5] to-[#2f5aae] flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-white">
                   <path d="M5 3h14l-1 4H6L5 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
                   <circle cx="12" cy="14" r="6" stroke="currentColor" strokeWidth="2"/>
                   <circle cx="12" cy="14" r="2.5" stroke="currentColor" strokeWidth="2"/>
                 </svg>
               </div>
               <div>
-                <div className="font-bold text-white text-lg leading-tight">United</div>
-                <div className="text-xs text-slate-400 leading-tight">Dry Cleaners Ltd</div>
+                <div className="font-bold text-white text-base leading-tight">United</div>
+                <div className="text-[10px] text-slate-400 leading-tight">Dry Cleaners Ltd</div>
               </div>
             </div>
-            <p className="text-sm mb-5 leading-relaxed">Serving Nairobi since 1965. Premium dry cleaning, laundry, and garment care you can trust.</p>
-            <div className="flex gap-3">
-              <a href="https://www.facebook.com/UnitedDryCleanersLtd" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#1877F2] hover:text-white flex items-center justify-center transition"><Facebook className="w-4 h-4" /></a>
-              <a href="https://www.instagram.com/uniteddrycleanersltd/" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#E4405F] hover:text-white flex items-center justify-center transition"><Instagram className="w-4 h-4" /></a>
-              <a href="https://wa.me/254729112066" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#25D366] hover:text-white flex items-center justify-center transition"><img src="https://img.icons8.com/ios-filled/50/FFFFFF/whatsapp.png" className="w-4 h-4" alt="WhatsApp" /></a>
-              <a href="https://www.youtube.com/@uniteddrycleaners" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#FF0000] hover:text-white flex items-center justify-center transition"><img src="https://img.icons8.com/ios-filled/50/FFFFFF/youtube-play.png" className="w-4 h-4" alt="YouTube" /></a>
-              <a href="https://www.tiktok.com/@uniteddrycleanersltd" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#000000] hover:text-white flex items-center justify-center transition"><img src="https://img.icons8.com/ios-filled/50/FFFFFF/tiktok.png" className="w-4 h-4" alt="TikTok" /></a>
+            <p className="text-xs mb-3 leading-relaxed">Serving Nairobi since 1965.</p>
+            <div className="flex gap-2">
+              <a href="https://www.facebook.com/UnitedDryCleanersLtd" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-[#1877F2] flex items-center justify-center transition"><Facebook className="w-3.5 h-3.5" /></a>
+              <a href="https://www.instagram.com/uniteddrycleanersltd/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-[#E4405F] flex items-center justify-center transition"><Instagram className="w-3.5 h-3.5" /></a>
+              <a href="https://wa.me/254729112066" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-[#25D366] flex items-center justify-center transition"><img src="https://img.icons8.com/ios-filled/50/FFFFFF/whatsapp.png" className="w-3.5 h-3.5" alt="WhatsApp" /></a>
+              <a href="https://www.youtube.com/@uniteddrycleaners" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-[#FF0000] flex items-center justify-center transition"><img src="https://img.icons8.com/ios-filled/50/FFFFFF/youtube-play.png" className="w-3.5 h-3.5" alt="YouTube" /></a>
+              <a href="https://www.tiktok.com/@uniteddrycleanersltd" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/10 hover:bg-black flex items-center justify-center transition"><img src="https://img.icons8.com/ios-filled/50/FFFFFF/tiktok.png" className="w-3.5 h-3.5" alt="TikTok" /></a>
             </div>
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-5">Quick Links</h4>
-            <ul className="space-y-3 text-sm">
+            <h4 className="text-white font-semibold text-sm mb-3">Quick Links</h4>
+            <ul className="space-y-1.5 text-sm">
               <li><Link to="/about" className="hover:text-[#EE6633] transition">About Us</Link></li>
               <li><Link to="/services" className="hover:text-[#EE6633] transition">Services</Link></li>
-              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Our Branches</Link></li>
+              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Branches</Link></li>
               <li><Link to="/pricing" className="hover:text-[#EE6633] transition">Pricing</Link></li>
               <li><Link to="/track" className="hover:text-[#EE6633] transition">Track Order</Link></li>
               <li><Link to="/contact" className="hover:text-[#EE6633] transition">Contact Us</Link></li>
@@ -95,8 +95,8 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-5">Services</h4>
-            <ul className="space-y-3 text-sm">
+            <h4 className="text-white font-semibold text-sm mb-3">Services</h4>
+            <ul className="space-y-1.5 text-sm">
               {['Dry Cleaning', 'Laundry Services', 'Steam Pressing', 'Wash, Dry & Fold', 'Wedding & Graduation Gowns', 'Leather Jacket Cleaning', 'Duvets & Beddings'].map((s) => (
                 <li key={s}><Link to="/services" className="hover:text-[#EE6633] transition">{s}</Link></li>
               ))}
@@ -104,40 +104,40 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-5">Our Branches</h4>
-            <ul className="space-y-3 text-sm">
-              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Munyu Road (UDC): 7:00am-6:00pm</Link></li>
-              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Ruiru (UDC): 7:30am-6:30pm</Link></li>
-              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Malindi (UDC): 7:30am-5:30pm</Link></li>
-              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Nairobi West (YUDC): 7:00-6:30pm</Link></li>
-              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Kenyatta Market (YUDC): 7:00am-6:30pm</Link></li>
-              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Thika (YUDC): 8:00am-6:00pm</Link></li>
-              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Uthiru (YUDC): 7:00am-7:00pm</Link></li>
+            <h4 className="text-white font-semibold text-sm mb-3">Our Branches</h4>
+            <ul className="space-y-1.5 text-sm">
+              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Munyu Road (UDC)</Link></li>
+              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Ruiru (UDC)</Link></li>
+              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Malindi (UDC)</Link></li>
+              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Nairobi West (YUDC)</Link></li>
+              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Kenyatta Market (YUDC)</Link></li>
+              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Thika (YUDC)</Link></li>
+              <li><Link to="/branches" className="hover:text-[#EE6633] transition">Uthiru (YUDC)</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-5">Contact Us</h4>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 mt-0.5 text-[#EE6633] flex-shrink-0" />
-                <span>United Dry Cleaners Mansion,<br />Munyu Road/Sheikh Karume Junction</span>
+            <h4 className="text-white font-semibold text-sm mb-3">Contact Us</h4>
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-start gap-2">
+                <MapPin className="w-3.5 h-3.5 mt-0.5 text-[#EE6633] shrink-0" />
+                <span className="text-xs">United Dry Cleaners Mansion, Munyu Road</span>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-[#EE6633]" />
-                <a href="tel:+254729112066" className="hover:text-white transition">+254 729 112 066</a>
+              <li className="flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5 text-[#EE6633] shrink-0" />
+                <a href="tel:+254729112066" className="text-xs hover:text-white transition">+254 729 112 066</a>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-[#EE6633]" />
-                <a href="tel:+254733810400" className="hover:text-white transition">+254 733 810 400</a>
+              <li className="flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5 text-[#EE6633] shrink-0" />
+                <a href="tel:+254733810400" className="text-xs hover:text-white transition">+254 733 810 400</a>
               </li>
-              <li className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-[#EE6633]" />
-                <a href="mailto:info@uniteddrycleaners.co.ke" className="hover:text-white transition">info@uniteddrycleaners.co.ke</a>
+              <li className="flex items-center gap-2">
+                <Mail className="w-3.5 h-3.5 text-[#EE6633] shrink-0" />
+                <a href="mailto:info@uniteddrycleaners.co.ke" className="text-xs hover:text-white transition">info@uniteddrycleaners.co.ke</a>
               </li>
-              <li className="flex items-start gap-3">
-                <Clock className="w-4 h-4 mt-0.5 text-[#EE6633] flex-shrink-0" />
-                <span>Mon-Fri: 7:00am - 6:00pm<br />Sat: 7:00am - 5:00pm<br />Sun &amp; Holidays: Closed</span>
+              <li className="flex items-start gap-2">
+                <Clock className="w-3.5 h-3.5 mt-0.5 text-[#EE6633] shrink-0" />
+                <span className="text-xs">Mon-Fri 7am-6pm, Sat 7am-5pm</span>
               </li>
             </ul>
           </div>
