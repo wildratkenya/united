@@ -10,9 +10,9 @@ import { toast } from '@/components/ui/sonner';
 
 interface Order {
   id: string; order_id: string; customer_name: string; email: string;
-  phone: string; address: string; service: string; status: string; total_amount: number;
+  phone: string;   address: string; service: string; status: string; total_amount: number;
   assigned_to: string | null; assigned_name: string | null; created_at: string;
-  items: any; timeline: any; notes: string; eta: string;
+  items: any; timeline: any; notes: string; eta: string; delivery_method?: string;
 }
 
 interface WorkerProfile {
@@ -201,6 +201,10 @@ const WorkerOrders = () => {
                 <div>
                   <p className="text-slate-400 text-xs mb-1">Amount</p>
                   <p className="font-medium">KES {Number(selectedOrder.total_amount).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400 text-xs mb-1">Delivery</p>
+                  <p className="font-medium">{selectedOrder.delivery_method === 'pickup' ? 'Self Pickup' : 'We Deliver'}</p>
                 </div>
                 <div>
                   <p className="text-slate-400 text-xs mb-1">Address</p>

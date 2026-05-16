@@ -5,7 +5,7 @@ import { useWorkerAuth } from '@/contexts/WorkerAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/sonner';
-import { Loader2, Plus, Minus, Search, User, MapPin, Phone, Mail, FileText, Sparkles, CheckCircle2, Copy, ArrowLeft } from 'lucide-react';
+import { Loader2, Plus, Minus, Search, User, MapPin, Phone, Mail, FileText, Sparkles, CheckCircle2, Copy, ArrowLeft, Store, Truck } from 'lucide-react';
 
 interface PricingItem {
   id: string;
@@ -30,6 +30,7 @@ const CreateOrder = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [qty, setQty] = useState<Record<string, number>>({});
+  const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
 
   const [form, setForm] = useState({
     name: '', email: '', phone: '', address: '', date: '', slot: timeSlots[0], notes: '',
@@ -64,12 +65,16 @@ const CreateOrder = () => {
   }, [pricing, qty]);
 
   const count = useMemo(() => Object.values(qty).reduce((a, b) => a + b, 0), [qty]);
-  const deliveryFee = total >= 1500 || total === 0 ? 0 : 200;
+  const deliveryFee = deliveryMethod === 'pickup' ? 0 : (total >= 1500 || total === 0 ? 0 : 200);
   const grandTotal = total + deliveryFee;
 
   const submit = async () => {
-    if (!form.name || !form.email || !form.phone || !form.address || !form.date) {
+    if (!form.name || !form.email || !form.phone || !form.date) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+    if (deliveryMethod === 'delivery' && !form.address) {
+      toast.error('Address is required for delivery');
       return;
     }
     if (count === 0) {
@@ -100,11 +105,11 @@ const CreateOrder = () => {
         customer_name: form.name,
         email: form.email,
         phone: form.phone,
-        address: form.address,
+        address: deliveryMethod === 'delivery' ? form.address : 'Self pickup',
         service: itemsArray.map(i => i.name).join(', '),
         scheduled_date: form.date,
         scheduled_slot: form.slot,
-        notes: form.notes || null,
+        notes: deliveryMethod === 'pickup' ? `[Pickup] ${form.notes || ''}` : form.notes || null,
         items: itemsArray,
         total_amount: grandTotal,
         status: 'received',
@@ -113,6 +118,7 @@ const CreateOrder = () => {
         timeline,
         assigned_to: null,
         assigned_name: null,
+        delivery_method: deliveryMethod,
       });
 
       if (insertError) throw insertError;
@@ -195,10 +201,41 @@ const CreateOrder = () => {
                 <label className="text-xs font-medium text-slate-500 mb-1 block flex items-center gap-1"><Phone className="h-3 w-3" /> Phone *</label>
                 <Input value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="+254 7XX XXX XXX" />
               </div>
-              <div>
-                <label className="text-xs font-medium text-slate-500 mb-1 block flex items-center gap-1"><MapPin className="h-3 w-3" /> Address *</label>
-                <Input value={form.address} onChange={e => update('address', e.target.value)} placeholder="Building, street, area" />
-              </div>
+              {deliveryMethod === 'delivery' && (
+                <div>
+                  <label className="text-xs font-medium text-slate-500 mb-1 block flex items-center gap-1"><MapPin className="h-3 w-3" /> Address *</label>
+                  <Input value={form.address} onChange={e => update('address', e.target.value)} placeholder="Building, street, area" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Delivery Method */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+            <h2 className="font-semibold text-[#1a2332]">Delivery Method</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <button type="button" onClick={() => setDeliveryMethod('delivery')} className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                deliveryMethod === 'delivery' ? 'border-[#EE6633] bg-orange-50' : 'border-slate-200 hover:border-slate-300'
+              }`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${deliveryMethod === 'delivery' ? 'bg-[#EE6633] text-white' : 'bg-slate-100 text-slate-500'}`}>
+                  <Truck className="h-5 w-5" />
+                </div>
+                <div className="text-left">
+                  <div className="font-semibold text-sm text-[#1a2332]">We Deliver</div>
+                  <div className="text-xs text-slate-500">KES 200 or free above 1,500</div>
+                </div>
+              </button>
+              <button type="button" onClick={() => setDeliveryMethod('pickup')} className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                deliveryMethod === 'pickup' ? 'border-[#EE6633] bg-orange-50' : 'border-slate-200 hover:border-slate-300'
+              }`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${deliveryMethod === 'pickup' ? 'bg-[#EE6633] text-white' : 'bg-slate-100 text-slate-500'}`}>
+                  <Store className="h-5 w-5" />
+                </div>
+                <div className="text-left">
+                  <div className="font-semibold text-sm text-[#1a2332]">Customer Picks Up</div>
+                  <div className="text-xs text-slate-500">No delivery fee</div>
+                </div>
+              </button>
             </div>
           </div>
 
@@ -281,6 +318,13 @@ const CreateOrder = () => {
               <div className="text-xs text-white/50">{count} {count === 1 ? 'item' : 'items'}</div>
             </div>
 
+            <div className="flex items-center gap-2 text-xs text-white/50 mb-1">
+              {deliveryMethod === 'delivery' ? (
+                <><Truck className="h-3 w-3" /> Delivery</>
+              ) : (
+                <><Store className="h-3 w-3" /> Self Pickup</>
+              )}
+            </div>
             <div className="space-y-2 pb-4 border-b border-white/10 text-sm">
               <div className="flex justify-between">
                 <span className="text-white/60">Subtotal</span>

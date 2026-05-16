@@ -44,6 +44,7 @@ interface Order {
   created_at: string;
   assigned_to: string | null;
   assigned_name: string | null;
+  delivery_method?: string;
 }
 
 const ORDER_STATUSES = [
@@ -336,6 +337,10 @@ const Orders = () => {
                 <div>
                   <p className="text-muted-foreground text-xs mb-1">Amount</p>
                   <p className="font-medium">KES {Number(selectedOrder.total_amount).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs mb-1">Delivery</p>
+                  <p className="font-medium">{selectedOrder.delivery_method === 'pickup' ? 'Self Pickup' : 'We Deliver'}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs mb-1">Scheduled</p>
