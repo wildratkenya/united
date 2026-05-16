@@ -56,9 +56,9 @@ const App = () => (
             </Route>
             <Route path="/admin" element={<AdminAuthProvider><Outlet /></AdminAuthProvider>}>
               <Route path="login" element={<AdminLogin />} />
-              <Route path="setup" element={<AdminSetup />} />
               <Route element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
                 <Route index element={<AdminDashboard />} />
+                <Route path="setup" element={<AdminSetup />} />
                 <Route path="orders" element={<AdminOrders />} />
                 <Route path="subscribers" element={<AdminSubscribers />} />
                 <Route path="pricing" element={<AdminPricing />} />

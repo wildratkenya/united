@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -94,7 +94,7 @@ const AdminLogin = () => {
             </Button>
           </form>
           <p className="text-center text-xs text-muted-foreground mt-6">
-            Authorized personnel only. <Link to="/admin/setup" className="text-blue-600 hover:underline">Setup</Link>
+            Authorized personnel only.
           </p>
         </CardContent>
       </Card>
