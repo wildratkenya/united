@@ -9,15 +9,18 @@ const stationColors: Record<string, string> = {
   supervisor: 'bg-amber-500',
 };
 
-const navItems = [
-  { to: '/worker', icon: LayoutDashboard, label: 'Kanban', end: true },
-  { to: '/worker/create-order', icon: PlusCircle, label: 'New Order' },
-  { to: '/worker/queue', icon: ListTodo, label: 'My Queue' },
-  { to: '/worker/orders', icon: ClipboardList, label: 'All Orders' },
-];
+const isSupervisorOrAdmin = (stations?: string[]) => stations?.includes('supervisor') || false;
 
 const WorkerLayout = () => {
   const { profile, logout } = useWorkerAuth();
+  const isSupervisor = isSupervisorOrAdmin(profile?.stations);
+
+  const navItems = [
+    { to: '/worker', icon: LayoutDashboard, label: 'Dashboard', end: true },
+    { to: '/worker/create-order', icon: PlusCircle, label: 'New Order' },
+    { to: '/worker/queue', icon: ListTodo, label: 'My Queue' },
+    ...(isSupervisor ? [{ to: '/worker/orders', icon: ClipboardList as any, label: 'All Orders' }] : []),
+  ];
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 

@@ -5,7 +5,7 @@ import { StatusBadge, STAGES, STAGE_LABELS } from './StatusBadge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, UserCheck, Pencil, Save, X, ChevronRight, Truck, Store } from 'lucide-react';
+import { Loader2, UserCheck, Pencil, Save, X, ChevronRight, ChevronLeft, Truck, Store } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 
 interface WorkerProfile {
@@ -25,6 +25,9 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated }: OrderDetailDialo
   const [assigning, setAssigning] = useState(false);
   const [advancing, setAdvancing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [movingBack, setMovingBack] = useState(false);
+  const [backTarget, setBackTarget] = useState('');
+  const [backReason, setBackReason] = useState('');
   const [workers, setWorkers] = useState<WorkerProfile[]>([]);
   const [form, setForm] = useState<any>({});
 
@@ -87,6 +90,31 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated }: OrderDetailDialo
       onUpdated();
     }
     setAdvancing(false);
+  };
+
+  const previousStages = STAGES.slice(0, currentIdx);
+
+  const moveBack = async () => {
+    if (!backTarget || !backReason.trim()) { toast.error('Select a stage and provide a reason'); return; }
+    setMovingBack(true);
+    const targetIdx = STAGES.indexOf(backTarget);
+    const timelineEntry = {
+      status: backTarget, timestamp: new Date().toISOString(),
+      note: `Moved back from ${STAGE_LABELS[order.status]} to ${STAGE_LABELS[backTarget]} — Reason: ${backReason} (by ${profile?.name || 'Worker'})`,
+    };
+    const currentTimeline = form.timeline || [];
+    const { error } = await supabase.from('orders').update({
+      status: backTarget, current_stage: targetIdx,
+      timeline: [...currentTimeline, timelineEntry],
+      updated_at: new Date().toISOString(),
+    }).eq('id', order.id);
+    if (error) { toast.error(error.message); }
+    else {
+      toast.success(`Moved back to ${STAGE_LABELS[backTarget]}`);
+      setForm((f: any) => ({ ...f, status: backTarget, current_stage: targetIdx, timeline: [...currentTimeline, timelineEntry] }));
+      setBackTarget(''); setBackReason(''); onUpdated();
+    }
+    setMovingBack(false);
   };
 
   const saveChanges = async () => {
@@ -199,6 +227,50 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated }: OrderDetailDialo
               {advancing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ChevronRight className="mr-2 h-4 w-4" />}
               Advance to {STAGE_LABELS[nextStage!]} →
             </Button>
+          </div>
+        )}
+
+        {/* Move Back — supervisor/admin only */}
+        {isSupervisorOrAdmin && currentIdx > 0 && (
+          <div className="pt-4 border-t border-slate-100">
+            <button
+              onClick={() => setMovingBack(!movingBack)}
+              className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 font-medium"
+            >
+              <ChevronLeft className={`h-3 w-3 transition ${movingBack ? 'rotate-90' : ''}`} />
+              Move to Previous Stage
+            </button>
+            {movingBack && (
+              <div className="mt-3 space-y-3 p-3 rounded-xl bg-red-50 border border-red-200">
+                <div>
+                  <p className="text-xs font-medium text-red-700 mb-1">Move to stage</p>
+                  <select value={backTarget} onChange={e => setBackTarget(e.target.value)} className="w-full h-9 rounded-xl border border-red-200 bg-white px-3 text-sm">
+                    <option value="">Select stage...</option>
+                    {previousStages.map(s => (
+                      <option key={s} value={s}>{STAGE_LABELS[s]}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-red-700 mb-1">Reason for moving back *</p>
+                  <textarea
+                    value={backReason}
+                    onChange={e => setBackReason(e.target.value)}
+                    rows={2}
+                    className="w-full px-3 py-2 border border-red-200 rounded-xl outline-none focus:border-red-400 resize-none text-sm bg-white"
+                    placeholder="e.g. Stained, needs re-wash, poor pressing..."
+                  />
+                </div>
+                <Button
+                  onClick={moveBack}
+                  disabled={movingBack || !backTarget || !backReason.trim()}
+                  className="w-full bg-red-500 hover:bg-red-600 text-sm"
+                >
+                  {movingBack ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ChevronLeft className="mr-2 h-4 w-4" />}
+                  Move to {backTarget ? STAGE_LABELS[backTarget] : '...'}
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
