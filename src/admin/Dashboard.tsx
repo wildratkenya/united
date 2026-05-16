@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ShoppingBag, Users, DollarSign, Clock, TrendingUp, Package } from 'lucide-react';
+import { ShoppingBag, Users, DollarSign, Clock, TrendingUp, Package, Eye } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import OrderDetailDialog from '@/components/worker/OrderDetailDialog';
 
 interface DashboardStats {
   totalOrders: number;
@@ -16,10 +18,22 @@ interface RecentOrder {
   id: string;
   order_id: string;
   customer_name: string;
+  email: string;
+  phone: string;
+  address: string;
   service: string;
+  notes: string;
+  items: any[];
   status: string;
+  current_stage: number;
   total_amount: number;
+  timeline: any[];
   created_at: string;
+  assigned_to: string | null;
+  assigned_name: string | null;
+  delivery_method?: string;
+  scheduled_date: string;
+  scheduled_slot: string;
 }
 
 const statusColors: Record<string, string> = {
@@ -39,6 +53,7 @@ const Dashboard = () => {
     totalServices: 0, todayOrders: 0, revenue: 0,
   });
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<RecentOrder | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -81,7 +96,7 @@ const Dashboard = () => {
   const loadRecentOrders = async () => {
     const { data } = await supabase
       .from('orders')
-      .select('id, order_id, customer_name, service, status, total_amount, created_at')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(10);
 
@@ -146,7 +161,8 @@ const Dashboard = () => {
                     <th className="text-left font-medium text-muted-foreground pb-3 pr-4">Service</th>
                     <th className="text-left font-medium text-muted-foreground pb-3 pr-4">Amount</th>
                     <th className="text-left font-medium text-muted-foreground pb-3 pr-4">Status</th>
-                    <th className="text-left font-medium text-muted-foreground pb-3">Date</th>
+                    <th className="text-left font-medium text-muted-foreground pb-3 pr-4">Date</th>
+                    <th className="text-right font-medium text-muted-foreground pb-3">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -164,6 +180,11 @@ const Dashboard = () => {
                       <td className="py-3 text-muted-foreground text-xs">
                         {new Date(order.created_at).toLocaleDateString('en-KE', { day: 'numeric', month: 'short' })}
                       </td>
+                      <td className="py-3 text-right">
+                        <Button variant="ghost" size="sm" onClick={() => setSelectedOrder(order)}>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -172,6 +193,14 @@ const Dashboard = () => {
           )}
         </CardContent>
       </Card>
+
+      <OrderDetailDialog
+        order={selectedOrder}
+        open={!!selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+        onUpdated={() => loadRecentOrders()}
+        supervisorOverride={true}
+      />
     </div>
   );
 };
