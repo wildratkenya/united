@@ -6,10 +6,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { email, password, name, stations } = req.body;
+  const { email, password, name, stations, location_type, location_name } = req.body;
 
   if (!email || !password || !name || !stations?.length) {
     return res.status(400).json({ error: 'email, password, name, and stations are required' });
+  }
+  if (!location_type || !location_name) {
+    return res.status(400).json({ error: 'location_type and location_name are required' });
   }
 
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -45,6 +48,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       name,
       stations,
       is_active: true,
+      location_type,
+      location_name,
     });
 
   if (profileError) {

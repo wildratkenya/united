@@ -1,19 +1,10 @@
 import React from 'react';
 import { MapPin, Clock, Phone, Store } from 'lucide-react';
+import { branches, agents as agentNames } from '@/lib/locations';
 
-const branches = [
-  { name: 'Munyu Road (UDC)', hours: '7:00am - 6:00pm', phone: '+254 729 112 066', address: 'United Dry Cleaners Mansion, Munyu Road/Sheikh Karume Junction', type: 'UDC' },
-  { name: 'Ruiru (UDC)', hours: '7:30am - 6:30pm', phone: '+254 729 112 066', address: 'Ruiru', type: 'UDC' },
-  { name: 'Malindi (UDC)', hours: '7:30am - 5:30pm', phone: '+254 729 112 066', address: 'Malindi', type: 'UDC' },
-  { name: 'Nairobi West (YUDC)', hours: '7:00am - 6:30pm', phone: '+254 733 810 400', address: 'Nairobi West', type: 'YUDC' },
-  { name: 'Kenyatta Market (YUDC)', hours: '7:00am - 6:30pm', phone: '+254 733 810 400', address: 'Kenyatta Market', type: 'YUDC' },
-  { name: 'Thika (YUDC)', hours: '8:00am - 6:00pm', phone: '+254 733 810 400', address: 'Thika', type: 'YUDC' },
-  { name: 'Uthiru (YUDC)', hours: '7:00am - 7:00pm', phone: '+254 733 810 400', address: 'Uthiru', type: 'YUDC' },
-];
-
-const agents = [
-  ['Lanscar - Eastern Bypass', 'Pajama - Machakos Town', 'Nwans Express - GSU Main Gate', 'Jefra Xpress - Kahawa Sukari', 'Glitter House - Gatundu Township', 'Sportless - Matangi', 'Lovelten - Kirigiti, Kiambu'],
-  ['Kleanwel - Regen', 'Safi Sana - Jamhuri', 'Welkin - Ruai/Utawala', 'Cleanpoint - Limuru', 'Fuapp - Online App', 'Welclean - Kinoo', 'Town & OJ Membley'],
+const agentColumns = [
+  agentNames.slice(0, 7),
+  agentNames.slice(7),
 ];
 
 const Branches: React.FC = () => {
@@ -67,7 +58,7 @@ const Branches: React.FC = () => {
           <h3 className="text-2xl font-bold text-[#1a2332] mb-2 text-center">Our Agent Network</h3>
           <p className="text-slate-500 text-center mb-8">Visit your nearest agent for professional garment care</p>
           <div className="grid md:grid-cols-2 gap-8">
-            {agents.map((col, i) => (
+            {agentColumns.map((col, i) => (
               <ul key={i} className="space-y-3">
                 {col.map((a) => (
                   <li key={a} className="flex items-center gap-3 text-sm text-slate-700">

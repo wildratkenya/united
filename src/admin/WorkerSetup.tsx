@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, HardHat, UserPlus, CheckCircle, XCircle, Plus, AlertCircle } from 'lucide-react';
+import { Loader2, HardHat, UserPlus, CheckCircle, XCircle, Plus, AlertCircle, Store, MapPin } from 'lucide-react';
 import { CaptchaWidget } from '@/components/CaptchaWidget';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { logAudit } from '@/lib/audit';
+import { branches, agents } from '@/lib/locations';
 
 const stations = [
   { value: 'intake', label: 'Intake & Sorting' },
@@ -33,7 +34,7 @@ const stationColors: Record<string, string> = {
 const AdminWorkerSetup = () => {
   const { toast } = useToast();
   const { user, profile } = useAdminAuth();
-  const [form, setForm] = useState({ email: '', password: 'P@ssword', name: '', stations: [] as string[], selectedStation: '' });
+  const [form, setForm] = useState({ email: '', password: 'P@ssword', name: '', stations: [] as string[], selectedStation: '', locationType: '', locationName: '' });
   const [submitting, setSubmitting] = useState(false);
   const [captchaToken, setCaptchaToken] = useState('');
   const [workers, setWorkers] = useState<any[]>([]);
@@ -64,15 +65,17 @@ const AdminWorkerSetup = () => {
     e.preventDefault();
     setSubmitting(true);
     if (form.stations.length === 0) { toast({ title: 'Error', description: 'Add at least one station', variant: 'destructive' }); setSubmitting(false); return; }
+    if (!form.locationType || !form.locationName) { toast({ title: 'Error', description: 'Select a branch or agent location', variant: 'destructive' }); setSubmitting(false); return; }
+
+    const locationPayload = { location_type: form.locationType, location_name: form.locationName };
 
     try {
-      // First try the API (works in production, requires vercel dev locally)
       let created = false;
       try {
         const res = await fetch('/api/create-worker', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: form.email, password: form.password, name: form.name, stations: form.stations }),
+          body: JSON.stringify({ email: form.email, password: form.password, name: form.name, stations: form.stations, ...locationPayload }),
         });
         if (res.ok) { created = true; }
         else {
@@ -83,7 +86,6 @@ const AdminWorkerSetup = () => {
         console.warn('API not available, falling back to client-side signUp');
       }
 
-      // Fallback: client-side signUp
       if (!created) {
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: form.email, password: form.password,
@@ -95,7 +97,7 @@ const AdminWorkerSetup = () => {
         if (!userId) { toast({ title: 'Error', description: 'User created but no ID. Disable email confirmation in Supabase Auth settings.', variant: 'destructive' }); setSubmitting(false); return; }
 
         const { error: insertError } = await supabase.from('worker_profiles').insert({
-          user_id: userId, email: form.email, name: form.name, stations: form.stations, is_active: true,
+          user_id: userId, email: form.email, name: form.name, stations: form.stations, is_active: true, ...locationPayload,
         });
         if (insertError) { toast({ title: 'Error', description: insertError.message, variant: 'destructive' }); setSubmitting(false); return; }
       }
@@ -107,9 +109,9 @@ const AdminWorkerSetup = () => {
         userEmail: user?.email || undefined,
         userName: profile?.name || 'Admin',
         entityType: 'worker',
-        details: { workerName: form.name, workerEmail: form.email, stations: form.stations },
+        details: { workerName: form.name, workerEmail: form.email, stations: form.stations, locationType: form.locationType, locationName: form.locationName },
       });
-      setForm({ email: '', password: 'P@ssword', name: '', stations: [], selectedStation: '' });
+      setForm({ email: '', password: 'P@ssword', name: '', stations: [], selectedStation: '', locationType: '', locationName: '' });
       loadWorkers();
     } catch (err: any) { toast({ title: 'Error', description: err.message, variant: 'destructive' }); }
     setSubmitting(false);
@@ -208,6 +210,32 @@ const AdminWorkerSetup = () => {
                 <p className="text-xs text-slate-400 mt-2">No stations assigned yet. Add at least one.</p>
               )}
             </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>Location</Label>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setForm(f => ({ ...f, locationType: 'branch', locationName: '' }))} className={`flex-1 flex items-center gap-2 p-3 rounded-xl border-2 text-sm transition ${form.locationType === 'branch' ? 'border-[#008cd5] bg-blue-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                  <Store className={`w-4 h-4 ${form.locationType === 'branch' ? 'text-[#008cd5]' : 'text-slate-400'}`} />
+                  <span className="font-medium">Branch</span>
+                </button>
+                <button type="button" onClick={() => setForm(f => ({ ...f, locationType: 'agent', locationName: '' }))} className={`flex-1 flex items-center gap-2 p-3 rounded-xl border-2 text-sm transition ${form.locationType === 'agent' ? 'border-[#EE6633] bg-orange-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                  <MapPin className={`w-4 h-4 ${form.locationType === 'agent' ? 'text-[#EE6633]' : 'text-slate-400'}`} />
+                  <span className="font-medium">Agent</span>
+                </button>
+              </div>
+              {form.locationType && (
+                <select
+                  value={form.locationName}
+                  onChange={e => setForm(f => ({ ...f, locationName: e.target.value }))}
+                  className="w-full h-11 rounded-xl border border-input bg-background px-3 text-sm"
+                  required
+                >
+                  <option value="">Select {form.locationType}...</option>
+                  {(form.locationType === 'branch' ? branches : agents).map(name => (
+                    <option key={name} value={name}>{name}</option>
+                  ))}
+                </select>
+              )}
+            </div>
             <div className="md:col-span-2">
               <CaptchaWidget onToken={setCaptchaToken} />
               <Button type="submit" disabled={submitting} className="w-full h-11 bg-orange-500 hover:bg-orange-600">
@@ -234,6 +262,7 @@ const AdminWorkerSetup = () => {
                   <tr className="border-b text-left text-slate-500">
                     <th className="pb-3 font-medium">Name</th>
                     <th className="pb-3 font-medium">Email</th>
+                    <th className="pb-3 font-medium">Location</th>
                     <th className="pb-3 font-medium">Stations</th>
                     <th className="pb-3 font-medium">Status</th>
                     <th className="pb-3 font-medium">Created</th>
@@ -244,6 +273,18 @@ const AdminWorkerSetup = () => {
                     <tr key={w.id} className="border-b last:border-0">
                       <td className="py-3 font-medium text-[#1a2332]">{w.name}</td>
                       <td className="py-3 text-slate-600">{w.email}</td>
+                      <td className="py-3">
+                        {w.location_name ? (
+                          <div>
+                            <div className="text-xs font-medium text-[#1a2332]">{w.location_name}</div>
+                            <span className={`text-[10px] font-semibold ${w.location_type === 'branch' ? 'text-[#008cd5]' : 'text-[#EE6633]'}`}>
+                              {w.location_type === 'branch' ? 'Branch' : 'Agent'}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
+                      </td>
                       <td className="py-3">
                         <div className="flex flex-wrap gap-1">
                           {(w.stations || []).map((s: string) => (
@@ -279,7 +320,7 @@ const AdminWorkerSetup = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="py-3 text-slate-500">{new Date(w.created_at).toLocaleDateString()}</td>
+                      <td className="py-3 text-slate-500 text-xs">{new Date(w.created_at).toLocaleDateString()}</td>
                     </tr>
                   ))}
                 </tbody>

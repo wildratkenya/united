@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Loader2, HardHat, CheckCircle, AlertCircle, Plus, XCircle } from 'lucide-react';
+import { Loader2, HardHat, CheckCircle, AlertCircle, Plus, XCircle, Store, MapPin } from 'lucide-react';
 import { CaptchaWidget } from '@/components/CaptchaWidget';
+import { branches, agents } from '@/lib/locations';
 
 const stations = [
   { value: 'intake', label: 'Intake & Sorting' },
@@ -19,7 +20,7 @@ const stations = [
 ];
 
 const WorkerSetup = () => {
-  const [form, setForm] = useState({ email: '', password: '', name: '', stations: [] as string[], selectedStation: '' });
+  const [form, setForm] = useState({ email: '', password: '', name: '', stations: [] as string[], selectedStation: '', locationType: '', locationName: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -53,6 +54,7 @@ const WorkerSetup = () => {
     setNeedConfirmation(false);
 
     if (form.stations.length === 0) { setError('Add at least one station'); setSubmitting(false); return; }
+    if (!form.locationType || !form.locationName) { setError('Select a branch or agent location'); setSubmitting(false); return; }
 
     try {
       const { error: signUpError } = await supabase.auth.signUp({
@@ -73,6 +75,7 @@ const WorkerSetup = () => {
 
       const { error: insertError } = await supabase.from('worker_profiles').insert({
         user_id: user.id, email: form.email, name: form.name, stations: form.stations, is_active: true,
+        location_type: form.locationType, location_name: form.locationName,
       });
       if (insertError) { setError(`Profile failed: ${insertError.message}`); setSubmitting(false); return; }
 
@@ -187,7 +190,33 @@ const WorkerSetup = () => {
                 <p className="text-xs text-slate-400">No stations assigned yet.</p>
               )}
             </div>
-            {error && <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
+                  <div className="space-y-2">
+              <Label>Location</Label>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setForm(f => ({ ...f, locationType: 'branch', locationName: '' }))} className={`flex-1 flex items-center gap-2 p-3 rounded-xl border-2 text-sm transition ${form.locationType === 'branch' ? 'border-[#008cd5] bg-blue-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                  <Store className={`w-4 h-4 ${form.locationType === 'branch' ? 'text-[#008cd5]' : 'text-slate-400'}`} />
+                  <span className="font-medium">Branch</span>
+                </button>
+                <button type="button" onClick={() => setForm(f => ({ ...f, locationType: 'agent', locationName: '' }))} className={`flex-1 flex items-center gap-2 p-3 rounded-xl border-2 text-sm transition ${form.locationType === 'agent' ? 'border-[#EE6633] bg-orange-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                  <MapPin className={`w-4 h-4 ${form.locationType === 'agent' ? 'text-[#EE6633]' : 'text-slate-400'}`} />
+                  <span className="font-medium">Agent</span>
+                </button>
+              </div>
+              {form.locationType && (
+                <select
+                  value={form.locationName}
+                  onChange={e => setForm(f => ({ ...f, locationName: e.target.value }))}
+                  className="w-full h-11 rounded-xl border border-input bg-background px-3 text-sm"
+                  required
+                >
+                  <option value="">Select {form.locationType}...</option>
+                  {(form.locationType === 'branch' ? branches : agents).map(name => (
+                    <option key={name} value={name}>{name}</option>
+                  ))}
+                </select>
+              )}
+            </div>
+      {error && <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
             {needConfirmation && (
               <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-sm">
                 Email confirmation required. Check inbox or disable in Supabase Auth settings.
