@@ -562,3 +562,27 @@ INSERT INTO public.pricing (service_name, price_from, price_to, unit, turnaround
     ('Trousers', 250, 500, 'item', '24 hours', 'general'),
     ('Carpet Cleaning', 2000, 5000, 'item', '3-5 days', 'specialty')
 ON CONFLICT (service_name) DO NOTHING;
+
+--
+-- 8. WORKER PORTAL TABLES
+--
+
+CREATE TABLE IF NOT EXISTS public.worker_profiles (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    email text NOT NULL,
+    name text NOT NULL,
+    station text DEFAULT 'general',
+    is_active boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT now(),
+    CONSTRAINT worker_profiles_pkey PRIMARY KEY (id),
+    CONSTRAINT worker_profiles_user_id_key UNIQUE (user_id)
+);
+
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS assigned_to uuid;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS assigned_name text;
+
+ALTER TABLE public.worker_profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Workers can read own profile" ON public.worker_profiles FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Workers can insert own profile" ON public.worker_profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Workers can update own profile" ON public.worker_profiles FOR UPDATE USING (auth.uid() = user_id);

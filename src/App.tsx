@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
+import { WorkerAuthProvider } from "@/contexts/WorkerAuthContext";
+import { ProtectedWorkerRoute } from "@/components/worker/ProtectedWorkerRoute";
 import PageLayout from "@/components/layout/PageLayout";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
@@ -23,6 +25,12 @@ import AdminSubscribers from "./admin/Subscribers";
 import AdminPricing from "./admin/Pricing";
 import AdminSettings from "./admin/Settings";
 import AdminSetup from "./admin/Setup";
+import WorkerLogin from "./worker/Login";
+import WorkerSetup from "./worker/Setup";
+import WorkerLayout from "./worker/WorkerLayout";
+import WorkerDashboard from "./worker/Dashboard";
+import WorkerMyQueue from "./worker/MyQueue";
+import WorkerOrders from "./worker/Orders";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +60,15 @@ const App = () => (
                 <Route path="subscribers" element={<AdminSubscribers />} />
                 <Route path="pricing" element={<AdminPricing />} />
                 <Route path="settings" element={<AdminSettings />} />
+              </Route>
+            </Route>
+            <Route path="/worker" element={<WorkerAuthProvider><Outlet /></WorkerAuthProvider>}>
+              <Route path="login" element={<WorkerLogin />} />
+              <Route path="setup" element={<WorkerSetup />} />
+              <Route element={<ProtectedWorkerRoute><WorkerLayout /></ProtectedWorkerRoute>}>
+                <Route index element={<WorkerDashboard />} />
+                <Route path="queue" element={<WorkerMyQueue />} />
+                <Route path="orders" element={<WorkerOrders />} />
               </Route>
             </Route>
             <Route path="*" element={<NotFound />} />
