@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, HardHat, UserPlus, CheckCircle, XCircle, Plus, AlertCircle } from 'lucide-react';
 import { CaptchaWidget } from '@/components/CaptchaWidget';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { logAudit } from '@/lib/audit';
 
 const stations = [
   { value: 'intake', label: 'Intake & Sorting' },
@@ -30,6 +32,7 @@ const stationColors: Record<string, string> = {
 
 const AdminWorkerSetup = () => {
   const { toast } = useToast();
+  const { user, profile } = useAdminAuth();
   const [form, setForm] = useState({ email: '', password: 'P@ssword', name: '', stations: [] as string[], selectedStation: '' });
   const [submitting, setSubmitting] = useState(false);
   const [captchaToken, setCaptchaToken] = useState('');
@@ -97,6 +100,14 @@ const AdminWorkerSetup = () => {
       }
 
       toast({ title: 'Worker Created', description: `${form.name} can login at /worker/login` });
+      logAudit({
+        action: 'worker_created',
+        userId: user?.id,
+        userEmail: user?.email || undefined,
+        userName: profile?.name || 'Admin',
+        entityType: 'worker',
+        details: { workerName: form.name, workerEmail: form.email, stations: form.stations },
+      });
       setForm({ email: '', password: 'P@ssword', name: '', stations: [], selectedStation: '' });
       loadWorkers();
     } catch (err: any) { toast({ title: 'Error', description: err.message, variant: 'destructive' }); }

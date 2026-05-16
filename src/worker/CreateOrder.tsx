@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/sonner';
 import { Loader2, Plus, Minus, Search, User, MapPin, Phone, Mail, FileText, Sparkles, CheckCircle2, Copy, ArrowLeft, Store, Truck } from 'lucide-react';
+import { logAudit } from '@/lib/audit';
 
 interface PricingItem {
   id: string;
@@ -126,6 +127,15 @@ const CreateOrder = () => {
       setCreatedOrderId(orderId);
       setDone(true);
       toast.success('Order created successfully!');
+      logAudit({
+        action: 'order_created',
+        userId: profile?.user_id,
+        userEmail: profile?.email,
+        userName: profile?.name,
+        entityType: 'order',
+        entityId: orderId,
+        details: { customer: form.name, amount: grandTotal, items: count, deliveryMethod },
+      });
     } catch (e: any) {
       toast.error(e.message || 'Failed to create order');
     }

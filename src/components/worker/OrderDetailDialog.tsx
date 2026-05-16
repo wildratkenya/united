@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, UserCheck, Pencil, Save, X, ChevronRight, ChevronLeft, Truck, Store } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
+import { logAudit } from '@/lib/audit';
 
 interface WorkerProfile {
   id: string; user_id: string; name: string; email: string; stations: string[]; is_active: boolean;
@@ -33,7 +34,7 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated, supervisorOverride
   const [workers, setWorkers] = useState<WorkerProfile[]>([]);
   const [form, setForm] = useState<any>({});
 
-  const operatorName = supervisorOverride ? 'Admin' : (operatorName);
+  const operatorName = supervisorOverride ? 'Admin' : (profile?.name || 'Worker');
   const isSupervisorOrAdmin = supervisorOverride || profile?.stations?.includes('supervisor') || false;
   const currentIdx = STAGES.indexOf(order?.status);
   const canAdvance = currentIdx < STAGES.length - 1;
@@ -69,6 +70,15 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated, supervisorOverride
       toast.success(`Assigned to ${workerName}`);
       setForm((f: any) => ({ ...f, assigned_to: workerId, assigned_name: workerName, timeline: [...currentTimeline, timelineEntry] }));
       onUpdated();
+      logAudit({
+        action: 'order_assigned',
+        userId: profile?.user_id,
+        userEmail: profile?.email,
+        userName: profile?.name,
+        entityType: 'order',
+        entityId: order?.order_id,
+        details: { assignedTo: workerName, by: operatorName },
+      });
     }
     setAssigning(false);
   };
@@ -91,6 +101,15 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated, supervisorOverride
       toast.success(`Advanced to ${STAGE_LABELS[nextStage]}`);
       setForm((f: any) => ({ ...f, status: nextStage, current_stage: currentIdx + 1, timeline: [...currentTimeline, timelineEntry] }));
       onUpdated();
+      logAudit({
+        action: 'order_advanced',
+        userId: profile?.user_id,
+        userEmail: profile?.email,
+        userName: profile?.name,
+        entityType: 'order',
+        entityId: order?.order_id,
+        details: { fromStage: order.status, toStage: nextStage, by: operatorName },
+      });
     }
     setAdvancing(false);
   };
@@ -116,6 +135,15 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated, supervisorOverride
       toast.success(`Moved back to ${STAGE_LABELS[backTarget]}`);
       setForm((f: any) => ({ ...f, status: backTarget, current_stage: targetIdx, timeline: [...currentTimeline, timelineEntry] }));
       setBackTarget(''); setBackReason(''); onUpdated();
+      logAudit({
+        action: 'order_moved_back',
+        userId: profile?.user_id,
+        userEmail: profile?.email,
+        userName: profile?.name,
+        entityType: 'order',
+        entityId: order?.order_id,
+        details: { fromStage: order.status, toStage: backTarget, reason: backReason, by: operatorName },
+      });
     }
     setMovingBack(false);
   };
@@ -134,7 +162,18 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated, supervisorOverride
 
     const { error } = await supabase.from('orders').update(updates).eq('id', order.id);
     if (error) { toast.error(error.message); }
-    else { toast.success('Order updated'); setEditing(false); onUpdated(); }
+    else {
+      toast.success('Order updated'); setEditing(false); onUpdated();
+      logAudit({
+        action: 'order_edited',
+        userId: profile?.user_id,
+        userEmail: profile?.email,
+        userName: profile?.name,
+        entityType: 'order',
+        entityId: order?.order_id,
+        details: { changes: Object.keys(updates).filter(k => k !== 'updated_at'), by: operatorName },
+      });
+    }
     setSaving(false);
   };
 

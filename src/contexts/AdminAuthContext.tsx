@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User, Session } from '@supabase/supabase-js';
+import { logAudit } from '@/lib/audit';
 
 interface AdminProfile {
   id: string;
@@ -89,10 +90,24 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
       return 'Access denied: Admin account not found';
     }
 
+    logAudit({
+      action: 'admin_login',
+      userId: user.id,
+      userEmail: user.email || email,
+      userName: adminProfile.name || email,
+      details: { role: adminProfile.role },
+    });
+
     return null;
   };
 
   const logout = async () => {
+    logAudit({
+      action: 'admin_logout',
+      userId: user?.id,
+      userEmail: user?.email || undefined,
+      userName: profile?.name || undefined,
+    });
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);

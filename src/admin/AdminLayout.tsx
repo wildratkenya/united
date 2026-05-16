@@ -14,7 +14,8 @@ import {
   X,
   Shirt,
   ChevronDown,
-  HardHat
+  HardHat,
+  History
 } from 'lucide-react';
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
   { to: '/admin/subscribers', icon: Users, label: 'Subscribers' },
   { to: '/admin/workers/setup', icon: HardHat, label: 'Workers' },
   { to: '/admin/pricing', icon: DollarSign, label: 'Pricing' },
+  { to: '/admin/audit', icon: History, label: 'Audit Logs' },
   { to: '/admin/settings', icon: Settings, label: 'Settings' },
 ];
 

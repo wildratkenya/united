@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User, Session } from '@supabase/supabase-js';
+import { logAudit } from '@/lib/audit';
 
 interface WorkerProfile {
   id: string;
@@ -90,10 +91,24 @@ export const WorkerAuthProvider = ({ children }: { children: ReactNode }) => {
       return 'Account is deactivated. Contact supervisor.';
     }
 
+    logAudit({
+      action: 'worker_login',
+      userId: user.id,
+      userEmail: user.email || email,
+      userName: workerProfile.name || email,
+      details: { stations: workerProfile.stations },
+    });
+
     return null;
   };
 
   const logout = async () => {
+    logAudit({
+      action: 'worker_logout',
+      userId: user?.id,
+      userEmail: user?.email || undefined,
+      userName: profile?.name || undefined,
+    });
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
