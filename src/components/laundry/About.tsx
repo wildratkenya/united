@@ -1,14 +1,7 @@
 import React from 'react';
-import { Target, Eye, Heart, Shield, TrendingUp, Users } from 'lucide-react';
+import { Target, Eye } from 'lucide-react';
 
 const About: React.FC = () => {
-  const values = [
-    { icon: Shield, label: 'Professionalism' },
-    { icon: Heart, label: 'Integrity' },
-    { icon: Users, label: 'Ethics' },
-    { icon: TrendingUp, label: 'Continuous Improvement' },
-  ];
-
   return (
     <section id="about" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,15 +51,40 @@ const About: React.FC = () => {
           </div>
         </div>
 
-        <div>
-          <h3 className="text-2xl font-bold text-center text-[#1a2332] mb-8">Our Core Values</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-            {values.map((v) => (
-              <div key={v.label} className="text-center bg-slate-50 rounded-xl p-6 border border-slate-100 hover:border-[#008cd5]/30 transition">
-                <div className="w-14 h-14 rounded-full bg-[#008cd5]/10 flex items-center justify-center mx-auto mb-4">
-                  <v.icon className="w-7 h-7 text-[#008cd5]" />
+        <div className="bg-gradient-to-r from-[#1a2332] via-[#2d4059] to-[#1a2332] rounded-3xl p-10 sm:p-14 text-white">
+          <div className="text-center mb-10">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white/80 text-sm font-semibold mb-3">
+              BOARD OF DIRECTORS
+            </div>
+            <h3 className="text-3xl sm:text-4xl font-bold">Leadership & Governance</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: 'Col. (Rtd) Philip K. Mwaniki', title: 'Chairman', img: '/board/placeholder-1.jpg' },
+              { name: 'Dr. Samuel Kamau Mungai', title: 'Managing Director', img: '/board/placeholder-2.jpg' },
+              { name: 'Eng. Henry J. Kamuti', title: 'Director', img: '/board/placeholder-3.jpg' },
+              { name: 'Francis Mburu Kahata', title: 'Director', img: '/board/placeholder-4.jpg' },
+            ].map((director, i) => (
+              <div key={i} className="group text-center">
+                <div className="w-28 h-28 rounded-full mx-auto mb-4 overflow-hidden ring-4 ring-white/20 group-hover:ring-[#EE6633]/60 transition-all duration-300 shadow-xl">
+                  <img
+                    src={director.img}
+                    alt={director.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      const parent = (e.target as HTMLImageElement).parentElement;
+                      if (parent) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'w-full h-full bg-gradient-to-br from-[#EE6633] to-[#d45522] flex items-center justify-center text-3xl font-bold text-white';
+                        fallback.textContent = director.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+                        parent.appendChild(fallback);
+                      }
+                    }}
+                  />
                 </div>
-                <h4 className="font-bold text-[#1a2332]">{v.label}</h4>
+                <h4 className="font-bold text-lg">{director.name}</h4>
+                <p className="text-sm text-white/60">{director.title}</p>
               </div>
             ))}
           </div>
