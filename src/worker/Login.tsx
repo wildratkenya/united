@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useWorkerAuth } from '@/contexts/WorkerAuthContext';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Loader2, Shirt, Lock, HardHat } from 'lucide-react';
+import { CaptchaWidget } from '@/components/CaptchaWidget';
 
 const WorkerLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
   const { login } = useWorkerAuth();
   const navigate = useNavigate();
 
@@ -19,10 +22,24 @@ const WorkerLogin = () => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
-    const err = await login(email, password);
+    const err = await login(email, password, { captchaToken });
     setSubmitting(false);
-    if (err) setError(err);
-    else navigate('/worker');
+    if (err) { setError(err); return; }
+
+    // Redirect supervisors/admins to admin panel
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from('worker_profiles')
+        .select('stations')
+        .eq('user_id', user.id)
+        .single();
+      if (profile?.stations?.some((s: string) => s === 'supervisor' || s === 'admin')) {
+        navigate('/admin');
+        return;
+      }
+    }
+    navigate('/worker');
   };
 
   return (
@@ -67,6 +84,7 @@ const WorkerLogin = () => {
                 <span>{error}</span>
               </div>
             )}
+            <CaptchaWidget onToken={setCaptchaToken} />
             <Button type="submit" disabled={submitting} className="w-full h-11 bg-[#EE6633] hover:bg-[#d45522]">
               {submitting ? (
                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...</>

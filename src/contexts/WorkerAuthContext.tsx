@@ -15,7 +15,7 @@ interface WorkerAuthContextType {
   session: Session | null;
   profile: WorkerProfile | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<string | null>;
+  login: (email: string, password: string, options?: { captchaToken?: string }) => Promise<string | null>;
   logout: () => Promise<void>;
   isWorker: boolean;
 }
@@ -67,8 +67,8 @@ export const WorkerAuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   };
 
-  const login = async (email: string, password: string): Promise<string | null> => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const login = async (email: string, password: string, opts?: { captchaToken?: string }): Promise<string | null> => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken: opts?.captchaToken } });
     if (error) return error.message;
 
     const { data: { user } } = await supabase.auth.getUser();

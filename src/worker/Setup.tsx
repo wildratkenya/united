@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Loader2, HardHat, CheckCircle, AlertCircle, Plus, XCircle } from 'lucide-react';
+import { CaptchaWidget } from '@/components/CaptchaWidget';
 
 const stations = [
   { value: 'intake', label: 'Intake & Sorting' },
@@ -22,6 +23,7 @@ const WorkerSetup = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
   const [checking, setChecking] = useState(true);
   const [workerExists, setWorkerExists] = useState(false);
   const [needConfirmation, setNeedConfirmation] = useState(false);
@@ -56,7 +58,7 @@ const WorkerSetup = () => {
       const { error: signUpError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
-        options: { data: { name: form.name, stations: form.stations } },
+        options: { data: { name: form.name, stations: form.stations }, captchaToken },
       });
       if (signUpError) { setError(signUpError.message); setSubmitting(false); return; }
 
@@ -191,6 +193,7 @@ const WorkerSetup = () => {
                 Email confirmation required. Check inbox or disable in Supabase Auth settings.
               </div>
             )}
+            <CaptchaWidget onToken={setCaptchaToken} />
             <Button type="submit" disabled={submitting} className="w-full h-11 bg-[#EE6633] hover:bg-[#d45522]">
               {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating...</> : 'Create Worker'}
             </Button>

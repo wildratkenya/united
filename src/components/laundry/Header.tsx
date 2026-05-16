@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, Search } from 'lucide-react';
+import { Menu, X, Phone, Search, LogIn } from 'lucide-react';
 
 interface HeaderProps {
   onTrackClick: () => void;
@@ -74,6 +74,12 @@ const Header: React.FC<HeaderProps> = ({ onTrackClick, onBookClick }) => {
               <Phone className="w-4 h-4" />
               +254 729 112 066
             </a>
+            <Link
+              to="/worker/login"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-slate-300 text-slate-600 font-semibold text-sm hover:bg-slate-100 transition"
+            >
+              <LogIn className="w-4 h-4" /> Sign In
+            </Link>
             <button
               onClick={onTrackClick}
               className="flex items-center gap-2 px-4 py-2.5 rounded-full border-2 border-[#1a2332] text-[#1a2332] font-semibold text-sm hover:bg-[#1a2332] hover:text-white transition"
@@ -108,6 +114,7 @@ const Header: React.FC<HeaderProps> = ({ onTrackClick, onBookClick }) => {
               </Link>
             ))}
             <div className="flex gap-2 px-4 pt-2">
+              <Link to="/worker/login" onClick={() => setOpen(false)} className="flex-1 px-4 py-2.5 rounded-full border border-slate-300 text-slate-600 font-semibold text-sm text-center">Sign In</Link>
               <button onClick={() => { onTrackClick(); setOpen(false); }} className="flex-1 px-4 py-2.5 rounded-full border-2 border-[#1a2332] text-[#1a2332] font-semibold text-sm">Track</button>
               <button onClick={() => { onBookClick(); setOpen(false); }} className="flex-1 px-4 py-2.5 rounded-full bg-[#EE6633] text-white font-semibold text-sm">Book</button>
             </div>

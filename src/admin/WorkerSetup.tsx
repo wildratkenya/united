@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, HardHat, UserPlus, CheckCircle, XCircle, Plus, AlertCircle } from 'lucide-react';
+import { CaptchaWidget } from '@/components/CaptchaWidget';
 
 const stations = [
   { value: 'intake', label: 'Intake & Sorting' },
@@ -31,6 +32,7 @@ const AdminWorkerSetup = () => {
   const { toast } = useToast();
   const [form, setForm] = useState({ email: '', password: 'P@ssword', name: '', stations: [] as string[], selectedStation: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
   const [workers, setWorkers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -81,7 +83,7 @@ const AdminWorkerSetup = () => {
       if (!created) {
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: form.email, password: form.password,
-          options: { data: { name: form.name, stations: form.stations } },
+          options: { data: { name: form.name, stations: form.stations }, captchaToken },
         });
         if (signUpError) { toast({ title: 'Error', description: `Signup failed: ${signUpError.message}. Disable email confirmation in Supabase Auth settings, or run \`npx vercel dev\` locally.`, variant: 'destructive' }); setSubmitting(false); return; }
 
@@ -172,6 +174,7 @@ const AdminWorkerSetup = () => {
                   <strong>Note:</strong> For this to work without email verification, add the Supabase service role key as <code className="bg-amber-100 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> in your Vercel env vars, or disable "Confirm email" in Supabase Auth settings.
                 </div>
               </div>
+              <CaptchaWidget onToken={setCaptchaToken} />
               <Button type="submit" disabled={submitting} className="w-full h-11 bg-orange-500 hover:bg-orange-600">
                 {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating...</> : 'Create Worker Account'}
               </Button>
