@@ -17,10 +17,12 @@ interface OrderDetailDialogProps {
   open: boolean;
   onClose: () => void;
   onUpdated: () => void;
+  supervisorOverride?: boolean;
 }
 
-const OrderDetailDialog = ({ order, open, onClose, onUpdated }: OrderDetailDialogProps) => {
-  const { profile } = useWorkerAuth();
+const OrderDetailDialog = ({ order, open, onClose, onUpdated, supervisorOverride }: OrderDetailDialogProps) => {
+  const workerAuth = (() => { try { return useWorkerAuth(); } catch { return null; } })();
+  const profile = workerAuth?.profile ?? null;
   const [editing, setEditing] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [advancing, setAdvancing] = useState(false);
@@ -31,7 +33,8 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated }: OrderDetailDialo
   const [workers, setWorkers] = useState<WorkerProfile[]>([]);
   const [form, setForm] = useState<any>({});
 
-  const isSupervisorOrAdmin = profile?.stations?.includes('supervisor') || false;
+  const operatorName = supervisorOverride ? 'Admin' : (operatorName);
+  const isSupervisorOrAdmin = supervisorOverride || profile?.stations?.includes('supervisor') || false;
   const currentIdx = STAGES.indexOf(order?.status);
   const canAdvance = currentIdx < STAGES.length - 1;
   const nextStage = canAdvance ? STAGES[currentIdx + 1] : null;
@@ -53,7 +56,7 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated }: OrderDetailDialo
     setAssigning(true);
     const timelineEntry = {
       status: order.status, timestamp: new Date().toISOString(),
-      note: `Assigned to ${workerName} by ${profile?.name || 'Worker'}`,
+      note: `Assigned to ${workerName} by ${operatorName}`,
     };
     const currentTimeline = form.timeline || [];
     const { error } = await supabase.from('orders').update({
@@ -75,7 +78,7 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated }: OrderDetailDialo
     setAdvancing(true);
     const timelineEntry = {
       status: nextStage, timestamp: new Date().toISOString(),
-      note: `Advanced to ${STAGE_LABELS[nextStage]} by ${profile?.name || 'Worker'}`,
+      note: `Advanced to ${STAGE_LABELS[nextStage]} by ${operatorName}`,
     };
     const currentTimeline = form.timeline || [];
     const { error } = await supabase.from('orders').update({
@@ -100,7 +103,7 @@ const OrderDetailDialog = ({ order, open, onClose, onUpdated }: OrderDetailDialo
     const targetIdx = STAGES.indexOf(backTarget);
     const timelineEntry = {
       status: backTarget, timestamp: new Date().toISOString(),
-      note: `Moved back from ${STAGE_LABELS[order.status]} to ${STAGE_LABELS[backTarget]} — Reason: ${backReason} (by ${profile?.name || 'Worker'})`,
+      note: `Moved back from ${STAGE_LABELS[order.status]} to ${STAGE_LABELS[backTarget]} — Reason: ${backReason} (by ${operatorName})`,
     };
     const currentTimeline = form.timeline || [];
     const { error } = await supabase.from('orders').update({

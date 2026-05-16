@@ -11,18 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Search, Loader2, ChevronLeft, ChevronRight, Eye, Package, UserCheck } from 'lucide-react';
-import { toast } from '@/components/ui/sonner';
-
-interface WorkerProfile {
-  id: string; user_id: string; name: string; email: string; stations: string[];
-}
+import { Search, Loader2, ChevronLeft, ChevronRight, Eye, Package } from 'lucide-react';
+import OrderDetailDialog from '@/components/worker/OrderDetailDialog';
 
 interface Order {
   id: string;
@@ -88,14 +78,10 @@ const Orders = () => {
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [workers, setWorkers] = useState<WorkerProfile[]>([]);
-  const [assigning, setAssigning] = useState(false);
   const PAGE_SIZE = 20;
 
   useEffect(() => {
     loadOrders();
-    loadWorkers();
   }, [search, statusFilter, page]);
 
   const loadOrders = async () => {
@@ -120,71 +106,6 @@ const Orders = () => {
     setOrders((data as Order[]) || []);
     setTotal(count || 0);
     setLoading(false);
-  };
-
-  const updateStatus = async (orderId: string, newStatus: string) => {
-    setUpdatingId(orderId);
-    const stageIndex = ORDER_STATUSES.indexOf(newStatus);
-
-    const timelineEntry = {
-      status: newStatus,
-      timestamp: new Date().toISOString(),
-      note: `Status changed to ${newStatus}`,
-    };
-
-    const { data: existingOrder } = await supabase
-      .from('orders')
-      .select('timeline')
-      .eq('id', orderId)
-      .single();
-
-    const currentTimeline = (existingOrder as any)?.timeline || [];
-    const updatedTimeline = [...currentTimeline, timelineEntry];
-
-    await supabase
-      .from('orders')
-      .update({
-        status: newStatus,
-        current_stage: stageIndex,
-        timeline: updatedTimeline,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', orderId);
-
-    setUpdatingId(null);
-    loadOrders();
-    if (selectedOrder?.id === orderId) {
-      setSelectedOrder(prev => prev ? { ...prev, status: newStatus, current_stage: stageIndex, timeline: updatedTimeline } : null);
-    }
-  };
-
-  const loadWorkers = async () => {
-    const { data } = await supabase.from('worker_profiles').select('*');
-    setWorkers((data as WorkerProfile[]) || []);
-  };
-
-  const assignOrder = async (orderId: string, workerId: string, workerName: string) => {
-    setAssigning(true);
-    const timelineEntry = {
-      status: selectedOrder?.status || 'received',
-      timestamp: new Date().toISOString(),
-      note: `Assigned to ${workerName} by Admin`,
-    };
-    const currentTimeline = selectedOrder?.timeline || [];
-    const updatedTimeline = [...currentTimeline, timelineEntry];
-
-    const { error } = await supabase.from('orders').update({
-      assigned_to: workerId, assigned_name: workerName,
-      timeline: updatedTimeline, updated_at: new Date().toISOString(),
-    }).eq('id', orderId);
-
-    if (error) { toast.error(error.message); }
-    else {
-      toast.success(`Assigned to ${workerName}`);
-      setSelectedOrder(prev => prev ? { ...prev, assigned_to: workerId, assigned_name: workerName, timeline: updatedTimeline } : null);
-      loadOrders();
-    }
-    setAssigning(false);
   };
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -304,142 +225,13 @@ const Orders = () => {
       </Card>
 
       {/* Order detail dialog */}
-      <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          {selectedOrder && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <span className="font-mono text-sm">{selectedOrder.order_id}</span>
-                  <Badge variant="outline" className={statusColors[selectedOrder.status]}>
-                    {selectedOrder.status.charAt(0).toUpperCase() + selectedOrder.status.slice(1)}
-                  </Badge>
-                </DialogTitle>
-              </DialogHeader>
-
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground text-xs mb-1">Customer</p>
-                  <p className="font-medium">{selectedOrder.customer_name}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs mb-1">Phone</p>
-                  <p className="font-medium">{selectedOrder.phone}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs mb-1">Email</p>
-                  <p>{selectedOrder.email}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs mb-1">Service</p>
-                  <p className="font-medium">{selectedOrder.service}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs mb-1">Amount</p>
-                  <p className="font-medium">KES {Number(selectedOrder.total_amount).toLocaleString()}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs mb-1">Delivery</p>
-                  <p className="font-medium">{selectedOrder.delivery_method === 'pickup' ? 'Self Pickup' : 'We Deliver'}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs mb-1">Scheduled</p>
-                  <p>{selectedOrder.scheduled_date ? new Date(selectedOrder.scheduled_date).toLocaleDateString('en-KE') : 'Not set'} {selectedOrder.scheduled_slot}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-muted-foreground text-xs mb-1">Address</p>
-                  <p>{selectedOrder.address}</p>
-                </div>
-                {selectedOrder.notes && (
-                  <div className="col-span-2">
-                    <p className="text-muted-foreground text-xs mb-1">Notes</p>
-                    <p>{selectedOrder.notes}</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Assign */}
-              <div className="mt-6 pt-4 border-t border-gray-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Assigned To</p>
-                    <p className="text-sm text-muted-foreground">{selectedOrder.assigned_name || 'Not assigned'}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <select
-                      value=""
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          const w = workers.find(w => w.id === e.target.value);
-                          if (w) assignOrder(selectedOrder.id, w.user_id, w.name);
-                        }
-                      }}
-                      className="h-9 rounded-xl border border-input bg-background px-3 text-sm"
-                      disabled={assigning}
-                    >
-                      <option value="">{assigning ? 'Assigning...' : 'Assign to...'}</option>
-                      {workers.filter(w => w.is_active).map(w => (
-                        <option key={w.id} value={w.id}>{w.name} — {w.stations?.join(', ')}</option>
-                      ))}
-                    </select>
-                    <UserCheck className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Status update */}
-              <div className="mt-6 pt-4 border-t border-gray-100">
-                <p className="text-sm font-medium mb-3">Update Status</p>
-                <div className="flex flex-wrap gap-2">
-                  {ORDER_STATUSES.map((status) => (
-                    <Button
-                      key={status}
-                      size="sm"
-                      variant={selectedOrder.status === status ? 'default' : 'outline'}
-                      disabled={updatingId === selectedOrder.id}
-                      onClick={() => updateStatus(selectedOrder.id, status)}
-                      className="text-xs"
-                    >
-                      {updatingId === selectedOrder.id ? (
-                        <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                      ) : (
-                        <span className="mr-1">{statusIcons[status]}</span>
-                      )}
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Timeline */}
-              {selectedOrder.timeline && selectedOrder.timeline.length > 0 && (
-                <div className="mt-6 pt-4 border-t border-gray-100">
-                  <p className="text-sm font-medium mb-3">Timeline</p>
-                  <div className="space-y-3">
-                    {(selectedOrder.timeline as any[]).map((entry: any, idx: number) => (
-                      <div key={idx} className="flex gap-3 text-sm">
-                        <div className="flex flex-col items-center">
-                          <div className="h-2 w-2 rounded-full bg-primary mt-1.5" />
-                          {idx < selectedOrder.timeline.length - 1 && (
-                            <div className="w-px flex-1 bg-gray-200" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium capitalize">{entry.status}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(entry.timestamp).toLocaleString('en-KE')}
-                          </p>
-                          {entry.note && <p className="text-xs text-muted-foreground">{entry.note}</p>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <OrderDetailDialog
+        order={selectedOrder}
+        open={!!selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+        onUpdated={() => { loadOrders(); }}
+        supervisorOverride={true}
+      />
     </div>
   );
 };
