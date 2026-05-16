@@ -9,7 +9,7 @@ const statusColors: Record<string, string> = {
   delivered: 'bg-slate-100 text-slate-600',
 };
 
-const statusEmojis: Record<string, string> = {
+export const statusEmojis: Record<string, string> = {
   received: '📥', processing: '🔄', washing: '🧼', drying: '💨',
   pressing: '👔', packaging: '📦', ready: '✅', delivered: '🚚',
 };
