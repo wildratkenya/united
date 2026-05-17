@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Loader2, HardHat, CheckCircle, AlertCircle, Plus, XCircle, Store, MapPin } from 'lucide-react';
 import { CaptchaWidget } from '@/components/CaptchaWidget';
-import { branches, agents } from '@/lib/locations';
+import { branchNames, agents } from '@/lib/locations';
 
 const stations = [
   { value: 'intake', label: 'Intake & Sorting' },
@@ -210,7 +210,7 @@ const WorkerSetup = () => {
                   required
                 >
                   <option value="">Select {form.locationType}...</option>
-                  {(form.locationType === 'branch' ? branches : agents).map(name => (
+                  {(form.locationType === 'branch' ? branchNames : agents).map(name => (
                     <option key={name} value={name}>{name}</option>
                   ))}
                 </select>

@@ -9,7 +9,7 @@ import { Loader2, HardHat, UserPlus, CheckCircle, XCircle, Plus, AlertCircle, St
 import { CaptchaWidget } from '@/components/CaptchaWidget';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { logAudit } from '@/lib/audit';
-import { branches, agents } from '@/lib/locations';
+import { branchNames, agents } from '@/lib/locations';
 
 const stations = [
   { value: 'intake', label: 'Intake & Sorting' },
@@ -230,7 +230,7 @@ const AdminWorkerSetup = () => {
                   required
                 >
                   <option value="">Select {form.locationType}...</option>
-                  {(form.locationType === 'branch' ? branches : agents).map(name => (
+                  {(form.locationType === 'branch' ? branchNames : agents).map(name => (
                     <option key={name} value={name}>{name}</option>
                   ))}
                 </select>
